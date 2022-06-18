@@ -16,13 +16,9 @@ using namespace std;
 class GBX
 {
 private:
-	//DEBUG=========================================================
-	uint64_t _debug_counter = 0;
-	uint64_t _debug_counter2 = 0;
-	//=========================================================
-
 
 	bool FATAL_ERROR_FLAG = false;//ロードなどで続行不能なエラーが発生したか
+
 
 
 	Key* key;
@@ -4840,8 +4836,6 @@ public:
 		ppu_line_x = 0;
 		ppu_line_y = 0;
 		write_RAM_8bit(0xFF44, ppu_line_y);
-
-		_debug_counter = 1;
 
 		for (;;) {
 			watch_key_interrupt();
