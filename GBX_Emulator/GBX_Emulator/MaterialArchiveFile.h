@@ -13,7 +13,7 @@ using namespace std;
 
 #define ARCHIVE_FILE_PATH "RESOURCE_DATA"
 
-#define MAP_NAME "FC_EMULATOR_RESOURCE_ARCHIVE"
+#define MAP_NAME "GBX_EMULATOR_RESOURCE_ARCHIVE"
 
 struct file_info {
 	string file_path_name;
