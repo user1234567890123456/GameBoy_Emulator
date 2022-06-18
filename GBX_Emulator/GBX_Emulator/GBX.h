@@ -4906,7 +4906,7 @@ public:
 		}
 
 		if ((gbx_ram.RAM[0xFF40] & 0b10000000) != 0) {//LCD有効フラグが有効のとき
-			draw_screen_bg(myDirectXSystem);//bgをwindowよりも先に呼び出すこと
+			draw_screen_bg(myDirectXSystem);
 			draw_screen_window(myDirectXSystem);
 			draw_screen_sprite(myDirectXSystem);
 		}
