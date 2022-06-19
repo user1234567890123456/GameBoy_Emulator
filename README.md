@@ -1,7 +1,7 @@
 # GBX_Emulator
 ゲームボーイのエミュレーターです  
 音は未実装です  
-動作しないソフトあります  
+動作しないソフトは多分あります  
 <br>
 # スクリーンショット
 ![pass1](https://user-images.githubusercontent.com/81889210/174439512-d6ad670e-81be-434f-9c57-06d0483070ae.png)
