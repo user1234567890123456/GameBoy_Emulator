@@ -442,7 +442,8 @@ LRESULT CALLBACK WinProc(HWND h_wnd, UINT u_msg, WPARAM w_param, LPARAM l_param)
 
 		ofn.lStructSize = sizeof(OPENFILENAME);
 		ofn.hwndOwner = h_wnd;
-		ofn.lpstrFilter = TEXT("ゲームボーイ(カラー)のROMのやつ (*.gb)\0*.gb\0")
+		ofn.lpstrFilter = //TEXT("ゲームボーイ(カラー)のROMのやつ (*.gb)\0*.gb\0")
+						  TEXT("ゲームボーイのROMのやつ (*.gb)\0*.gb\0")
 						  TEXT("すべてのファイル (*.*)\0*.*\0\0");
 		ofn.lpstrCustomFilter = strCustom;
 		ofn.nMaxCustFilter = 256;

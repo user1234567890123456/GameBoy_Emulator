@@ -20,15 +20,37 @@ private:
 	bool FATAL_ERROR_FLAG = false;//ロードなどで続行不能なエラーが発生したか
 
 
+#define BOOT_ROM_SIZE 0x100
+	bool booting_flag = true;//ブートロムを実行中ならtrue
+	//ブートロムのコード
+	const uint8_t READ_ONLY_BOOTROM_CODE_256byte[BOOT_ROM_SIZE] = {
+		0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C, 0x20, 0xFB, 0x21, 0x26, 0xFF, 0x0E,
+		0x11, 0x3E, 0x80, 0x32, 0xE2, 0x0C, 0x3E, 0xF3, 0xE2, 0x32, 0x3E, 0x77, 0x77, 0x3E, 0xFC, 0xE0,
+		0x47, 0x11, 0x04, 0x01, 0x21, 0x10, 0x80, 0x1A, 0xCD, 0x95, 0x00, 0xCD, 0x96, 0x00, 0x13, 0x7B,
+		0xFE, 0x34, 0x20, 0xF3, 0x11, 0xD8, 0x00, 0x06, 0x08, 0x1A, 0x13, 0x22, 0x23, 0x05, 0x20, 0xF9,
+		0x3E, 0x19, 0xEA, 0x10, 0x99, 0x21, 0x2F, 0x99, 0x0E, 0x0C, 0x3D, 0x28, 0x08, 0x32, 0x0D, 0x20,
+		0xF9, 0x2E, 0x0F, 0x18, 0xF3, 0x67, 0x3E, 0x64, 0x57, 0xE0, 0x42, 0x3E, 0x91, 0xE0, 0x40, 0x04,
+		0x1E, 0x02, 0x0E, 0x0C, 0xF0, 0x44, 0xFE, 0x90, 0x20, 0xFA, 0x0D, 0x20, 0xF7, 0x1D, 0x20, 0xF2,
+		0x0E, 0x13, 0x24, 0x7C, 0x1E, 0x83, 0xFE, 0x62, 0x28, 0x06, 0x1E, 0xC1, 0xFE, 0x64, 0x20, 0x06,
+		0x7B, 0xE2, 0x0C, 0x3E, 0x87, 0xE2, 0xF0, 0x42, 0x90, 0xE0, 0x42, 0x15, 0x20, 0xD2, 0x05, 0x20,
+		0x4F, 0x16, 0x20, 0x18, 0xCB, 0x4F, 0x06, 0x04, 0xC5, 0xCB, 0x11, 0x17, 0xC1, 0xCB, 0x11, 0x17,
+		0x05, 0x20, 0xF5, 0x22, 0x23, 0x22, 0x23, 0xC9, 0xCE, 0xED, 0x66, 0x66, 0xCC, 0x0D, 0x00, 0x0B,
+		0x03, 0x73, 0x00, 0x83, 0x00, 0x0C, 0x00, 0x0D, 0x00, 0x08, 0x11, 0x1F, 0x88, 0x89, 0x00, 0x0E,
+		0xDC, 0xCC, 0x6E, 0xE6, 0xDD, 0xDD, 0xD9, 0x99, 0xBB, 0xBB, 0x67, 0x63, 0x6E, 0x0E, 0xEC, 0xCC,
+		0xDD, 0xDC, 0x99, 0x9F, 0xBB, 0xB9, 0x33, 0x3E, 0x3C, 0x42, 0xB9, 0xA5, 0xB9, 0xA5, 0x42, 0x3C,
+		0x21, 0x04, 0x01, 0x11, 0xA8, 0x00, 0x1A, 0x13, 0xBE, 0x20, 0xFE, 0x23, 0x7D, 0xFE, 0x34, 0x20,
+		0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE, 0x3E, 0x01, 0xE0, 0x50,
+	};
+	uint8_t bootrom_256byte[BOOT_ROM_SIZE];
+	void init_bootrom() {//ブートロムの初期化をする
+		memcpy(bootrom_256byte, READ_ONLY_BOOTROM_CODE_256byte, BOOT_ROM_SIZE);
+	}
+
 
 	Key* key;
 
 
 	bool tmp_CPU_HALT_Flag = false;
-
-
-	uint64_t hblank_process_stage_counter = 0;
-	uint64_t vblank_process_stage_counter = 0;
 
 
 #define GB_PALETTE_0 0xFF9bbc0f
@@ -740,97 +762,110 @@ private:
 	uint8_t read_RAM_8bit(uint16_t read_address) {
 		uint8_t read_value = 0x00;
 
-		if (read_address <= 0x3FFF) {//ROMバンク00
-			read_value = gbx_ram.RAM[read_address];
+		if (booting_flag == true && read_address < 0x100) {//ブートロム中かつブートロム内のとき
+			read_value = bootrom_256byte[read_address];
 		}
-		else if (read_address <= 0x7FFF) {//ROMバンク01-7F
-			//read_value = gbx_ram.RAM[read_address];
+		else {
 
-			uint8_t* read_ROM_address = get_read_ROM_address();
-			read_value = read_ROM_address[read_address - 0x4000];
-		}
-		else if (0xA000 <= read_address && read_address <= 0xBFFF) {//RAMバンク00-03（存在する場合）
-			read_value = gbx_ram.RAM[read_address];
-		}
-		else if (read_address == 0xFF00) {//ジョイパッド
-			if ((gbx_ram.RAM[0xFF00] & 0b00010000) == 0) {//方向キー
-
-				uint8_t b_down = (key->get_input_state__GBX__(INPUT_MY_ID_DOWN) != 0) ? 1 : 0;
-				uint8_t b_up = (key->get_input_state__GBX__(INPUT_MY_ID_UP) != 0) ? 1 : 0;
-				uint8_t b_left = (key->get_input_state__GBX__(INPUT_MY_ID_LEFT) != 0) ? 1 : 0;
-				uint8_t b_right = (key->get_input_state__GBX__(INPUT_MY_ID_RIGHT) != 0) ? 1 : 0;
-
-				read_value = (gbx_ram.RAM[0xFF00] & 0b00110000);
-				read_value |= ((~((b_down << 3) | (b_up << 2) | (b_left << 1) | b_right)) & 0b00001111);
+			if (read_address <= 0x3FFF) {//ROMバンク00
+				read_value = gbx_ram.RAM[read_address];
 			}
-			else if ((gbx_ram.RAM[0xFF00] & 0b00100000) == 0) {//アクションキー
-				uint8_t b_start = (key->get_input_state__GBX__(INPUT_MY_ID_START) != 0) ? 1 : 0;
-				uint8_t b_select = (key->get_input_state__GBX__(INPUT_MY_ID_SELECT) != 0) ? 1 : 0;
-				uint8_t b_b = (key->get_input_state__GBX__(INPUT_MY_ID_B) != 0) ? 1 : 0;
-				uint8_t b_a = (key->get_input_state__GBX__(INPUT_MY_ID_A) != 0) ? 1 : 0;
+			else if (read_address <= 0x7FFF) {//ROMバンク01-7F
+				//read_value = gbx_ram.RAM[read_address];
 
-				read_value = (gbx_ram.RAM[0xFF00] & 0b00110000);
-				read_value |= ((~((b_start << 3) | (b_select << 2) | (b_b << 1) | b_a)) & 0b00001111);
+				uint8_t* read_ROM_address = get_read_ROM_address();
+				read_value = read_ROM_address[read_address - 0x4000];
 			}
-			else {
-				read_value = gbx_ram.RAM[0xFF00] & 0b00110000;
-				read_value |= 0b00001111;
+			else if (0xA000 <= read_address && read_address <= 0xBFFF) {//RAMバンク00-03（存在する場合）
+				read_value = gbx_ram.RAM[read_address];
 			}
-		}
-		else {//通常読み取り
-			read_value = gbx_ram.RAM[read_address];
+			else if (read_address == 0xFF00) {//ジョイパッド
+				if ((gbx_ram.RAM[0xFF00] & 0b00010000) == 0) {//方向キー
+
+					uint8_t b_down = (key->get_input_state__GBX__(INPUT_MY_ID_DOWN) != 0) ? 1 : 0;
+					uint8_t b_up = (key->get_input_state__GBX__(INPUT_MY_ID_UP) != 0) ? 1 : 0;
+					uint8_t b_left = (key->get_input_state__GBX__(INPUT_MY_ID_LEFT) != 0) ? 1 : 0;
+					uint8_t b_right = (key->get_input_state__GBX__(INPUT_MY_ID_RIGHT) != 0) ? 1 : 0;
+
+					read_value = (gbx_ram.RAM[0xFF00] & 0b00110000);
+					read_value |= ((~((b_down << 3) | (b_up << 2) | (b_left << 1) | b_right)) & 0b00001111);
+				}
+				else if ((gbx_ram.RAM[0xFF00] & 0b00100000) == 0) {//アクションキー
+					uint8_t b_start = (key->get_input_state__GBX__(INPUT_MY_ID_START) != 0) ? 1 : 0;
+					uint8_t b_select = (key->get_input_state__GBX__(INPUT_MY_ID_SELECT) != 0) ? 1 : 0;
+					uint8_t b_b = (key->get_input_state__GBX__(INPUT_MY_ID_B) != 0) ? 1 : 0;
+					uint8_t b_a = (key->get_input_state__GBX__(INPUT_MY_ID_A) != 0) ? 1 : 0;
+
+					read_value = (gbx_ram.RAM[0xFF00] & 0b00110000);
+					read_value |= ((~((b_start << 3) | (b_select << 2) | (b_b << 1) | b_a)) & 0b00001111);
+				}
+				else {
+					read_value = gbx_ram.RAM[0xFF00] & 0b00110000;
+					read_value |= 0b00001111;
+				}
+			}
+			else {//通常読み取り
+				read_value = gbx_ram.RAM[read_address];
+			}
 		}
 
 		return read_value;
 	}
 
 	uint16_t read_RAM_16bit(uint16_t read_address) {
-		return (gbx_ram.RAM[read_address] | (gbx_ram.RAM[read_address + 1] << 8));
+		//return (gbx_ram.RAM[read_address] | (gbx_ram.RAM[read_address + 1] << 8));
+
+		return (read_RAM_8bit(read_address) | (read_RAM_8bit(read_address + 1) << 8));
 	}
 
 	void write_RAM_8bit(uint16_t write_address, uint8_t value) {
-		if (write_address <= 0x1FFF) {//RAMの有効化
-			if ((value & 0b00001111) == 0x0A) {
-				RAM_Enable_Flag = true;
-			}
-			else {
-				RAM_Enable_Flag = false;
-			}
+		if (booting_flag == true && write_address < 0x100) {//ブートロム中かつブートロム内のとき
+			bootrom_256byte[write_address] = value;
 		}
-		else if (write_address <= 0x3FFF) {//ROMバンク番号
-			//M_debug_printf("write_address <= 0x3FFF [value = 0x%02x]\n", value);
-			//system("pause");
+		else {
+			if (write_address <= 0x1FFF) {//RAMの有効化
+				if ((value & 0b00001111) == 0x0A) {
+					RAM_Enable_Flag = true;
+				}
+				else {
+					RAM_Enable_Flag = false;
+				}
+			}
+			else if (write_address <= 0x3FFF) {//ROMバンク番号
+				//M_debug_printf("write_address <= 0x3FFF [value = 0x%02x]\n", value);
+				//system("pause");
 
-			bank_no = (value & 0b00011111);
-			if (bank_no == 0) {
-				bank_no = 1;
+				bank_no = (value & 0b00011111);
+				if (bank_no == 0) {
+					bank_no = 1;
+				}
 			}
-		}
-		else if (write_address <= 0x5FFF) {//RAMバンク番号-または-ROMバンク番号の上位ビット
-			//M_debug_printf("write_address <= 0x5FFF [value = 0x%02x]\n", value);
-			//system("pause");
-		}
-		else if (write_address <= 0x7FFF) {//ROM / RAMモード選択
-			//M_debug_printf("write_address <= 0x7FFF [value = 0x%02x]\n", value);
-			//system("pause");
-		}
-		else if (0xA000 <= write_address && write_address <= 0xBFFF) {//RAMバンク00-03（存在する場合）
-			gbx_ram.RAM[write_address] = value;
-		}
-		else if (write_address == 0xFF00) {//ジョイパッド
-			gbx_ram.RAM[0xFF00] = (value & 0b00110000);
-		}
-		else if (write_address == 0xFF04) {
-			gbx_ram.RAM[write_address] = 0x00;
-		}
-		else if (write_address == 0xFF46) {//DMA
-			uint16_t src_address = value << 8;
-			memcpy((void*)(&(gbx_ram.RAM[0xFE00])), (void*)(&(gbx_ram.RAM[src_address])), 40*4);
+			else if (write_address <= 0x5FFF) {//RAMバンク番号-または-ROMバンク番号の上位ビット
+				//M_debug_printf("write_address <= 0x5FFF [value = 0x%02x]\n", value);
+				//system("pause");
+			}
+			else if (write_address <= 0x7FFF) {//ROM / RAMモード選択
+				//M_debug_printf("write_address <= 0x7FFF [value = 0x%02x]\n", value);
+				//system("pause");
+			}
+			else if (0xA000 <= write_address && write_address <= 0xBFFF) {//RAMバンク00-03（存在する場合）
+				gbx_ram.RAM[write_address] = value;
+			}
+			else if (write_address == 0xFF00) {//ジョイパッド
+				gbx_ram.RAM[0xFF00] = (value & 0b00110000);
+			}
+			else if (write_address == 0xFF04) {
+				gbx_ram.RAM[write_address] = 0x00;
+			}
+			else if (write_address == 0xFF46) {//DMA
+				uint16_t src_address = value << 8;
+				memcpy((void*)(&(gbx_ram.RAM[0xFE00])), (void*)(&(gbx_ram.RAM[src_address])), 40 * 4);
 
-			//サイクル数はすすめない //cpu_machine_cycle += 160;//160 M-cycle かかる
-		}
-		else {//通常書き込み
-			gbx_ram.RAM[write_address] = value;
+				//サイクル数はすすめない //cpu_machine_cycle += 160;//160 M-cycle かかる
+			}
+			else {//通常書き込み
+				gbx_ram.RAM[write_address] = value;
+			}
 		}
 	}
 
@@ -3532,6 +3567,7 @@ private:
 		else {
 			if (((IE_value & IF_value) & 0b00011111) != 0) {//割り込みが保留中のとき
 				gbx_register.PC++;//ハードウエアのバグで1バイトすすめる
+				
 			}
 			else {
 				gbx_register.PC--;//PCをすすめずにとどまる
@@ -3998,12 +4034,12 @@ private:
 	//=============================================================================
 
 	void cpu_init() {
-		//gbx_register.AF = 0;
-		//gbx_register.BC = 0;
-		//gbx_register.DE = 0;
-		//gbx_register.HL = 0;
-		//gbx_register.SP = 0xFFFE;
-		//gbx_register.PC = 0x0100;
+		gbx_register.AF = 0;
+		gbx_register.BC = 0;
+		gbx_register.DE = 0;
+		gbx_register.HL = 0;
+		gbx_register.SP = 0x0000;
+		gbx_register.PC = 0x0000;
 
 		////gbx_register.A = 0x11;
 		////gbx_register.Flags = 0x80;
@@ -4016,16 +4052,16 @@ private:
 		////gbx_register.SP = 0xFFFE;
 		////gbx_register.PC = 0x0100;
 
-		gbx_register.A = 0x01;
-		gbx_register.Flags = 0xB0;
-		gbx_register.B = 0x00;
-		gbx_register.C = 0x13;
-		gbx_register.D = 0x00;
-		gbx_register.E = 0xD8;
-		gbx_register.H = 0x01;
-		gbx_register.L = 0x4D;
-		gbx_register.SP = 0xFFFE;
-		gbx_register.PC = 0x0100;
+		//gbx_register.A = 0x01;
+		//gbx_register.Flags = 0xB0;
+		//gbx_register.B = 0x00;
+		//gbx_register.C = 0x13;
+		//gbx_register.D = 0x00;
+		//gbx_register.E = 0xD8;
+		//gbx_register.H = 0x01;
+		//gbx_register.L = 0x4D;
+		//gbx_register.SP = 0xFFFE;
+		//gbx_register.PC = 0x0100;
 	}
 
 	void ppu_init() {
@@ -4128,123 +4164,6 @@ private:
 		fclose(rom_fp);
 
 		return -1;
-	}
-
-	void update_LCD_STAT() {
-		if (ppu_line_y >= 144) {
-			set_LCD_STAT_mode_flag(1);//1: VBlank
-		}
-		else if (0 <= ppu_line_x && ppu_line_x <= 80) {
-			set_LCD_STAT_mode_flag(2);//2: Searching OAM
-		}
-		else if (80 < ppu_line_x && ppu_line_x <= 240) {
-			set_LCD_STAT_mode_flag(3);//3: Transferring Data to LCD Controller
-		}
-		else {
-			set_LCD_STAT_mode_flag(0);//0: HBlank
-		}
-	}
-
-	void set_LCD_STAT_mode_flag(uint8_t mode_flag) {
-		write_RAM_8bit(0xFF41, (read_RAM_8bit(0xFF41) & 0b11111100) | (mode_flag & 0b00000011));
-	}
-
-	uint32_t c_cycle_mod = 0;//余りのC-Cycle
-	uint32_t ppu_line_x = 0;
-	uint32_t ppu_line_y = 0;
-
-	void execute_ppu_process(uint64_t c_cycle) {
-		for (uint64_t i = 0; i < c_cycle; i++) {
-			//M_debug_printf("ppu_line_x = %d, ppu_line_y = %d\n", ppu_line_x, ppu_line_y);
-
-			if (ppu_line_x == 0 && ppu_line_y == 0) {//初回は上端にあるスプライトのチェックをする
-				check_sprite_upside_16line();
-			}
-
-			if (ppu_line_x == 0) {
-				hblank_process_stage_counter = 0;
-
-				//===================================
-				//LCD_STAT割り込み OAM
-				if ((read_RAM_8bit(0xFF41) & 0b00100000) != 0) {//Bit 5 - Mode 2 OAM STAT Interrupt source
-					gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
-				}
-			}
-
-			//描画中
-			if ((80 <= ppu_line_x && ppu_line_x < 240) && ppu_line_y < 144) {
-				draw_backbuffer_bg_1pixel(ppu_line_x - 80, ppu_line_y);
-				draw_backbuffer_window_1pixel(ppu_line_x - 80, ppu_line_y);
-			}
-			if (((80 - 8) <= ppu_line_x && ppu_line_x < 240) && ppu_line_y < 144) {//X座標左端もチェックする
-				create_screen_sprite_data__1pixel(ppu_line_x - 80, ppu_line_y);
-			}
-
-			//HBLANK中
-			if (240 <= ppu_line_x) {
-				if (hblank_process_stage_counter == 0) {//初めてのときはHblankの割り込みを要求する
-					//===================================
-					//LCD_STAT割り込み HBLANK
-					if ((read_RAM_8bit(0xFF41) & 0b00001000) != 0) {//Bit 3 - Mode 0 HBlank STAT Interrupt source
-						gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
-					}
-				}
-
-				hblank_process_stage_counter++;
-				if (hblank_process_stage_counter > 1) {
-					hblank_process_stage_counter = 1;
-				}
-			}
-
-			ppu_line_x++;
-			if (ppu_line_x >= 456) {
-				ppu_line_x = 0;
-				ppu_line_y++;
-				write_RAM_8bit(0xFF44, ppu_line_y);
-
-				update_window_flag__1line();//ウィンドウの内部情報を1ラインごとに更新する
-
-				//===================================
-				//LCD_STAT割り込み LYC=LY
-				if ((read_RAM_8bit(0xFF41) & 0b01000000) != 0) {//Bit 6 - LYC=LY STAT Interrupt source
-					if (ppu_line_y == read_RAM_8bit(0xFF45)) {
-						gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
-					}
-				}
-				//LCD_STATのLYC=LYのフラグを更新する
-				if (ppu_line_y == read_RAM_8bit(0xFF45)) {
-					write_RAM_8bit(0xFF41, read_RAM_8bit(0xFF41) | 0b00000100);
-				}
-				else {
-					write_RAM_8bit(0xFF41, read_RAM_8bit(0xFF41) & 0b11111011);
-				}
-
-				if (ppu_line_y >= 144) {//Vblank開始
-					if (vblank_process_stage_counter == 0) {//初めてのときはVblankの割り込みを要求する
-						gbx_ram.RAM[0xFF0F] |= 0b00000001;//Vblankの割り込みを要求する
-
-						//===================================
-						//LCD_STAT割り込み VBLANK
-						if ((read_RAM_8bit(0xFF41) & 0b00010000) != 0) {//Bit 4 - Mode 1 VBlank STAT Interrupt source
-							gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
-						}
-					}
-
-					vblank_process_stage_counter++;
-					if (vblank_process_stage_counter > 1) {
-						vblank_process_stage_counter = 1;
-					}
-
-				}
-				if (ppu_line_y >= 154) {//Vblank終了
-					c_cycle_mod = c_cycle - (i + 1);//余りのC-Cycleを計算する
-
-					return;
-				}
-			}
-		}
-
-		c_cycle_mod = 0;//普段は余り0
 	}
 
 	uint8_t* get_backbuffer_data_256x256_ptr(bool tilemap_type1_flag, bool tiledata_type1_flag) {
@@ -4554,6 +4473,141 @@ private:
 		}
 	}
 
+	void update_LCD_STAT() {
+		if ((gbx_ram.RAM[0xFF40] & 0b10000000) == 0) {//LCD有効フラグが無効のとき
+			//LCDがオフのときはVblank状態にしておく
+			set_LCD_STAT_mode_flag(1);//1: VBlank
+
+			return;
+		}
+
+		uint8_t bef_STAT_mode = (read_RAM_8bit(0xFF41) & 0b00000011);//以前のモードを保存しておく
+
+		if (ppu_line_y >= 144) {
+			set_LCD_STAT_mode_flag(1);//1: VBlank
+		}
+		else if (0 <= ppu_line_x && ppu_line_x <= 80) {
+			set_LCD_STAT_mode_flag(2);//2: Searching OAM
+		}
+		else if (80 < ppu_line_x && ppu_line_x <= 240) {
+			set_LCD_STAT_mode_flag(3);//3: Transferring Data to LCD Controller
+		}
+		else {
+			set_LCD_STAT_mode_flag(0);//0: HBlank
+		}
+
+		uint8_t current_STAT_mode = (read_RAM_8bit(0xFF41) & 0b00000011);
+		if (bef_STAT_mode != current_STAT_mode) {//モードが変更された場合
+			if (current_STAT_mode == 0) {//0: HBlank
+				//LCD_STAT割り込み HBLANK
+				if ((read_RAM_8bit(0xFF41) & 0b00001000) != 0) {//Bit 3 - Mode 0 HBlank STAT Interrupt source
+					gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
+				}
+			}
+			else if (current_STAT_mode == 1) {//1: VBlank
+				//LCD_STAT割り込み VBLANK
+				if ((read_RAM_8bit(0xFF41) & 0b00010000) != 0) {//Bit 4 - Mode 1 VBlank STAT Interrupt source
+					gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
+				}
+			}
+			else if (current_STAT_mode == 2) {//2: Searching OAM
+				//LCD_STAT割り込み OAM
+				if ((read_RAM_8bit(0xFF41) & 0b00100000) != 0) {//Bit 5 - Mode 2 OAM STAT Interrupt source
+					gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
+				}
+			}
+		}
+	}
+
+	void set_LCD_STAT_mode_flag(uint8_t mode_flag) {
+		write_RAM_8bit(0xFF41, (read_RAM_8bit(0xFF41) & 0b11111100) | (mode_flag & 0b00000011));
+	}
+
+	uint32_t c_cycle_mod = 0;//余りのC-Cycle
+	uint32_t ppu_line_x = 0;
+	uint32_t ppu_line_y = 0;
+
+	void execute_ppu_process(uint64_t c_cycle) {
+		if ((gbx_ram.RAM[0xFF40] & 0b10000000) == 0) {//LCD有効フラグが無効のとき
+			for (uint64_t k = 0; k < c_cycle; k++) {
+				ppu_line_x++;
+				if (ppu_line_x >= 456) {
+					ppu_line_x = 0;
+					ppu_line_y++;
+					write_RAM_8bit(0xFF44, ppu_line_y);
+
+					if (ppu_line_y == 144) {//Vblank開始
+						gbx_ram.RAM[0xFF0F] |= 0b00000001;//Vblankの割り込みを要求する
+					}
+
+					if (ppu_line_y >= 154) {//Vblank終了
+						c_cycle_mod = c_cycle - (k + 1);//余りのC-Cycleを計算する
+
+						return;
+					}
+				}
+			}
+
+			c_cycle_mod = 0;
+
+			return;
+		}
+
+		for (uint64_t i = 0; i < c_cycle; i++) {
+			//M_debug_printf("ppu_line_x = %d, ppu_line_y = %d\n", ppu_line_x, ppu_line_y);
+
+			if (ppu_line_x == 0 && ppu_line_y == 0) {//初回は上端にあるスプライトのチェックをする
+				check_sprite_upside_16line();
+			}
+
+			//描画中
+			if ((80 <= ppu_line_x && ppu_line_x < 240) && ppu_line_y < 144) {
+				draw_backbuffer_bg_1pixel(ppu_line_x - 80, ppu_line_y);
+				draw_backbuffer_window_1pixel(ppu_line_x - 80, ppu_line_y);
+			}
+			if (((80 - 8) <= ppu_line_x && ppu_line_x < 240) && ppu_line_y < 144) {//X座標左端もチェックする
+				create_screen_sprite_data__1pixel(ppu_line_x - 80, ppu_line_y);
+			}
+
+			ppu_line_x++;
+			if (ppu_line_x >= 456) {
+				ppu_line_x = 0;
+				ppu_line_y++;
+				write_RAM_8bit(0xFF44, ppu_line_y);
+
+				update_window_flag__1line();//ウィンドウの内部情報を1ラインごとに更新する
+
+				//===================================
+				//LCD_STAT割り込み LYC=LY
+				if ((read_RAM_8bit(0xFF41) & 0b01000000) != 0) {//Bit 6 - LYC=LY STAT Interrupt source
+					if (ppu_line_y == read_RAM_8bit(0xFF45)) {
+						gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
+					}
+				}
+				//LCD_STATのLYC=LYのフラグを更新する
+				if (ppu_line_y == read_RAM_8bit(0xFF45)) {
+					write_RAM_8bit(0xFF41, read_RAM_8bit(0xFF41) | 0b00000100);
+				}
+				else {
+					write_RAM_8bit(0xFF41, read_RAM_8bit(0xFF41) & 0b11111011);
+				}
+				//===================================
+
+				if (ppu_line_y == 144) {//Vblank開始
+					//初めてのときはVblankの割り込みを要求する
+					gbx_ram.RAM[0xFF0F] |= 0b00000001;//Vblankの割り込みを要求する
+				}
+
+				if (ppu_line_y >= 154) {//Vblank終了
+					c_cycle_mod = c_cycle - (i + 1);//余りのC-Cycleを計算する
+
+					return;
+				}
+			}
+		}
+
+		c_cycle_mod = 0;//普段は余り0
+	}
 
 	bool backbuffer_sprite_mask[GBX_WIDTH * GBX_HEIGHT] = { false };//背景色でない場合true
 
@@ -4647,6 +4701,31 @@ private:
 				}
 
 				pTextureBuffer[y * GBX_WIDTH + x] = color;
+			}
+		}
+
+		pTexture->UnlockRect(0);
+
+		//MyDirectXDraw::draw_texture_base_leftup(myDirectXSystem, pTexture, (float)GBX_WIDTH, (float)GBX_HEIGHT, 0, 0);
+		MyDirectXDraw::draw_texture_base_leftup_enable_size(myDirectXSystem, pTexture, (float)GBX_WIDTH, (float)GBX_HEIGHT, 0, 0, 4.0);
+
+		pTexture->Release();
+	}
+
+	//LCDオフのときの画面の描画
+	void draw_screen_LCD_off(MyDirectXSystem* myDirectXSystem) {
+		LPDIRECT3DTEXTURE9 pTexture;
+		if (FAILED(myDirectXSystem->get_pDevice3D()->CreateTexture(GBX_WIDTH, GBX_HEIGHT, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, NULL))) {
+			return;
+		}
+		D3DLOCKED_RECT lockedRect;
+		pTexture->LockRect(0, &lockedRect, NULL, 0);
+		DWORD* pTextureBuffer = (DWORD*)lockedRect.pBits;
+
+		for (int y = 0; y < GBX_HEIGHT; y++) {
+			for (int x = 0; x < GBX_WIDTH; x++) {
+				//pTextureBuffer[y * GBX_WIDTH + x] = 0xFF4e454a;
+				pTextureBuffer[y * GBX_WIDTH + x] = GB_PALETTE_0;
 			}
 		}
 
@@ -4792,8 +4871,11 @@ public:
 		cpu_init();
 		ppu_init();
 		init_util();
+		init_bootrom();
 
 		Main::ROM_loaded_flag = true;
+
+		booting_flag = true;
 
 
 		M_debug_printf("################################\n");
@@ -4830,8 +4912,6 @@ public:
 		window_backbuffer_draw_internal_flag_x = false;
 		window_backbuffer_draw_internal_counter_y = 0;
 
-		hblank_process_stage_counter = 0;
-		vblank_process_stage_counter = 0;
 		cpu_machine_cycle = 0;
 		ppu_line_x = 0;
 		ppu_line_y = 0;
@@ -4840,21 +4920,30 @@ public:
 		for (;;) {
 			watch_key_interrupt();
 
-			uint8_t instruction_code = read_RAM_8bit(gbx_register.PC);
+			uint8_t instruction_code;
+
+			if (booting_flag == true) {//ブートロム実行中の時
+				instruction_code = bootrom_256byte[gbx_register.PC];
+			}
+			else {
+				instruction_code = read_RAM_8bit(gbx_register.PC);
+			}
 
 			//=========================================================
-			// 
+			
 			//M_debug_printf("=========================================================\n");
 			//M_debug_printf("PC:0x%04x [命令:0x%02x] A:0x%02x, BC:0x%04x, DE:0x%04x, HL:0x%04x, Flags:0x%02x, SP:0x%04x\n",
 			//	gbx_register.PC, instruction_code, gbx_register.A, gbx_register.BC, gbx_register.DE, gbx_register.HL, gbx_register.Flags, gbx_register.SP);
-			//M_debug_printf("TIMA(0xFF05) = 0x%02x\n", gbx_ram.RAM[0xFF05]);
-			//system("pause");
-			// 
+			
 			//=========================================================
 
 			gbx_register.PC++;
 
 			(this->*(cpu_instruction_table[instruction_code]))();
+
+			if (booting_flag == true && gbx_register.PC == 0x100) {
+				booting_flag = false;//ブートロム終了
+			}
 
 			uint32_t instruction_machine_cycle = instruction_machine_cycle_table[instruction_code];
 			if (instruction_machine_cycle == 0xDEADBEEF) {
@@ -4910,6 +4999,9 @@ public:
 			draw_screen_window(myDirectXSystem);
 			draw_screen_sprite(myDirectXSystem);
 		}
+		else {//LCD有効フラグが無効のとき
+			draw_screen_LCD_off(myDirectXSystem);
+		}
 
 #ifdef GBX_EMU_DEBUG
 		//_debug_draw_screen_256x256_backbuffer(myDirectXSystem, 0);
@@ -4921,6 +5013,6 @@ public:
 		//M_debug_printf("End 1 frame...\n");
 		
 		//system("pause");
+
 	}
 };
-
