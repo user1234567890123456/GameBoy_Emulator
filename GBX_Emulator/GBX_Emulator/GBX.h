@@ -4471,6 +4471,96 @@ private:
 			memset(SRAM_bank_data_ptr, 0, SRAM_BANK_DATA_SIZE);
 		}
 
+
+		if (Main::Cartridge_Type == 0x00) {
+			cart_mbc_type = CART_MBC_TYPE::ROM;
+		}
+		else if (Main::Cartridge_Type == 0x01) {
+			cart_mbc_type = CART_MBC_TYPE::MBC1;
+		}
+		else if (Main::Cartridge_Type == 0x02) {
+			cart_mbc_type = CART_MBC_TYPE::MBC1;
+		}
+		else if (Main::Cartridge_Type == 0x03) {
+			cart_mbc_type = CART_MBC_TYPE::MBC1;
+		}
+		else if (Main::Cartridge_Type == 0x05) {
+			cart_mbc_type = CART_MBC_TYPE::MBC2;
+		}
+		else if (Main::Cartridge_Type == 0x06) {
+			cart_mbc_type = CART_MBC_TYPE::MBC2;
+		}
+		else if (Main::Cartridge_Type == 0x08) {
+			cart_mbc_type = CART_MBC_TYPE::ROM;
+		}
+		else if (Main::Cartridge_Type == 0x09) {
+			cart_mbc_type = CART_MBC_TYPE::ROM;
+		}
+		else if (Main::Cartridge_Type == 0x0B) {
+			cart_mbc_type = CART_MBC_TYPE::OTHER;
+		}
+		else if (Main::Cartridge_Type == 0x0C) {
+			cart_mbc_type = CART_MBC_TYPE::OTHER;
+		}
+		else if (Main::Cartridge_Type == 0x0D) {
+			cart_mbc_type = CART_MBC_TYPE::OTHER;
+		}
+		else if (Main::Cartridge_Type == 0x0F) {
+			cart_mbc_type = CART_MBC_TYPE::MBC3;
+		}
+		else if (Main::Cartridge_Type == 0x10) {
+			cart_mbc_type = CART_MBC_TYPE::MBC3;
+		}
+		else if (Main::Cartridge_Type == 0x11) {
+			cart_mbc_type = CART_MBC_TYPE::MBC3;
+		}
+		else if (Main::Cartridge_Type == 0x12) {
+			cart_mbc_type = CART_MBC_TYPE::MBC3;
+		}
+		else if (Main::Cartridge_Type == 0x13) {
+			cart_mbc_type = CART_MBC_TYPE::MBC3;
+		}
+		else if (Main::Cartridge_Type == 0x19) {
+			cart_mbc_type = CART_MBC_TYPE::MBC5;
+		}
+		else if (Main::Cartridge_Type == 0x1A) {
+			cart_mbc_type = CART_MBC_TYPE::MBC5;
+		}
+		else if (Main::Cartridge_Type == 0x1B) {
+			cart_mbc_type = CART_MBC_TYPE::MBC5;
+		}
+		else if (Main::Cartridge_Type == 0x1C) {
+			cart_mbc_type = CART_MBC_TYPE::MBC5;
+		}
+		else if (Main::Cartridge_Type == 0x1D) {
+			cart_mbc_type = CART_MBC_TYPE::MBC5;
+		}
+		else if (Main::Cartridge_Type == 0x1E) {
+			cart_mbc_type = CART_MBC_TYPE::MBC5;
+		}
+		else if (Main::Cartridge_Type == 0x20) {
+			cart_mbc_type = CART_MBC_TYPE::OTHER;
+		}
+		else if (Main::Cartridge_Type == 0x22) {
+			cart_mbc_type = CART_MBC_TYPE::OTHER;
+		}
+		else if (Main::Cartridge_Type == 0xFC) {
+			cart_mbc_type = CART_MBC_TYPE::OTHER;
+		}
+		else if (Main::Cartridge_Type == 0xFD) {
+			cart_mbc_type = CART_MBC_TYPE::OTHER;
+		}
+		else if (Main::Cartridge_Type == 0xFE) {
+			cart_mbc_type = CART_MBC_TYPE::OTHER;
+		}
+		else if (Main::Cartridge_Type == 0xFF) {
+			cart_mbc_type = CART_MBC_TYPE::HuC1;
+		}
+		else {
+			cart_mbc_type = CART_MBC_TYPE::OTHER;
+		}
+
+
 		fclose(rom_fp);
 
 		return 0;

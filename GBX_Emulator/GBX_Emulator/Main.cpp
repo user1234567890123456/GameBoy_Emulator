@@ -562,7 +562,7 @@ LRESULT CALLBACK WinProc(HWND h_wnd, UINT u_msg, WPARAM w_param, LPARAM l_param)
 					strcpy_s(cart_type_name, 256, "UNKNOWN");
 				}
 				char tmp_str_buffer[512];
-				sprintf_s(tmp_str_buffer, "カードリッジのタイプ : %s\nプログラムROMサイズ : %dKB\nSRAMのサイズ : %dKB", cart_type_name, Main::PGM_size, Main::SRAM_size);
+				sprintf_s(tmp_str_buffer, "カードリッジのタイプ : [0x%02x] %s\nプログラムROMサイズ : %dKB\nSRAMのサイズ : %dKB", Main::Cartridge_Type, cart_type_name, Main::PGM_size, Main::SRAM_size);
 				MessageBox(NULL, _T(tmp_str_buffer), _T("ROM情報"), MB_ICONINFORMATION);
 			}
 			else {
