@@ -79,3 +79,7 @@ END
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 
+
+
+BOOTROM_BIN	BINARY		"bootrom/bootrom_256byte.bin"
+

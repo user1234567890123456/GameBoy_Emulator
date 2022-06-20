@@ -72,6 +72,7 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR command
 
 	CRC::Init();
 
+
 #ifdef GBX_EMU_DEBUG
 	//if (full_result == IDNO) {//NO
 //	if (fullscreen_result == false) {//NO
