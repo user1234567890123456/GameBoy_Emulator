@@ -25,9 +25,9 @@
 #define __MUTEX_NAME__ "Qs1qZvFeWlqVEq0lCmcUv9rzh3Xr8rNy"
 
 
-#define GBX_EMU_DEBUG
+//#define GBX_EMU_DEBUG
 
-#define TITLE "ゲームボーイのエミュレーター(重すぎ注意)"
+#define TITLE "ゲームボーイのエミュレーター"
 //#define TITLE "Gameboy Emulator"
 //#define TITLE "ゲームボーイ(カラー)のエミュレーター"
 
