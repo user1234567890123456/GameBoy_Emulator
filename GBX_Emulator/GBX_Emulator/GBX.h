@@ -831,15 +831,13 @@ private:
 			cart_mbc_type == CART_MBC_TYPE::MBC1 ||
 
 			cart_mbc_type == CART_MBC_TYPE::MBC3 ||
-			cart_mbc_type == CART_MBC_TYPE::MBC5)
+			cart_mbc_type == CART_MBC_TYPE::MBC5 ||
+			cart_mbc_type == CART_MBC_TYPE::HuC1)
 		{
 			use_sram_bank_no = (sram_bank_no & ((Main::SRAM_size >> 3/*8で割る*/) - 1));//SRAMのサイズに必要な範囲内になるようにANDで絞る
 		}
 		else if (cart_mbc_type == CART_MBC_TYPE::MBC2) {
 			return &(gbx_ram.RAM[0xA000]);
-		}
-		else if (cart_mbc_type == CART_MBC_TYPE::HuC1) {
-			use_sram_bank_no = sram_bank_no;
 		}
 
 		if (sram_bank_no == 0) {
