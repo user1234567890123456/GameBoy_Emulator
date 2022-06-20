@@ -767,7 +767,7 @@ private:
 	};
 	CART_MBC_TYPE cart_mbc_type;
 
-	uint8_t rom_bank_no__low = 0;
+	uint8_t rom_bank_no__low = 1;//初期はバンク1を指すようにする
 	uint8_t rom_bank_no__high = 0;
 	uint8_t sram_bank_no = 0;
 	bool SRAM_Enable_Flag = false;
@@ -829,7 +829,7 @@ private:
 		if (cart_mbc_type == CART_MBC_TYPE::ROM ||
 			cart_mbc_type == CART_MBC_TYPE::OTHER ||
 			cart_mbc_type == CART_MBC_TYPE::MBC1 ||
-
+	
 			cart_mbc_type == CART_MBC_TYPE::MBC3 ||
 			cart_mbc_type == CART_MBC_TYPE::MBC5 ||
 			cart_mbc_type == CART_MBC_TYPE::HuC1)
@@ -839,7 +839,7 @@ private:
 		else if (cart_mbc_type == CART_MBC_TYPE::MBC2) {
 			return &(gbx_ram.RAM[0xA000]);
 		}
-
+	
 		if (sram_bank_no == 0) {
 			return &(gbx_ram.RAM[0xA000]);
 		}
@@ -850,7 +850,7 @@ private:
 
 	uint8_t read_RAM_8bit(uint16_t read_address) {
 		uint8_t read_value = 0x00;
-
+	
 		if (booting_flag == true && read_address < 0x100) {//ブートロム中かつブートロム内のとき
 			read_value = bootrom_256byte[read_address];
 		}
@@ -860,7 +860,7 @@ private:
 			}
 			else if (read_address <= 0x7FFF) {//ROMバンク01-7F
 				//read_value = gbx_ram.RAM[read_address];
-
+	
 				uint8_t* read_ROM_address = get_read_ROM_address();
 				read_value = read_ROM_address[read_address - 0x4000];
 			}
@@ -877,7 +877,7 @@ private:
 					TODO
 					IRの読み取りを実装する
 					*/
-
+	
 					//0xC1（赤外線を受信した）または0xC0（受信しなかった）
 					read_value = 0xC0;//受信しなかったことにしておく
 				}
@@ -888,12 +888,12 @@ private:
 			}
 			else if (read_address == 0xFF00) {//ジョイパッド
 				if ((gbx_ram.RAM[0xFF00] & 0b00010000) == 0) {//方向キー
-
+	
 					uint8_t b_down = (key->get_input_state__GBX__(INPUT_MY_ID_DOWN) != 0) ? 1 : 0;
 					uint8_t b_up = (key->get_input_state__GBX__(INPUT_MY_ID_UP) != 0) ? 1 : 0;
 					uint8_t b_left = (key->get_input_state__GBX__(INPUT_MY_ID_LEFT) != 0) ? 1 : 0;
 					uint8_t b_right = (key->get_input_state__GBX__(INPUT_MY_ID_RIGHT) != 0) ? 1 : 0;
-
+	
 					read_value = (gbx_ram.RAM[0xFF00] & 0b00110000);
 					read_value |= ((~((b_down << 3) | (b_up << 2) | (b_left << 1) | b_right)) & 0b00001111);
 				}
@@ -902,7 +902,7 @@ private:
 					uint8_t b_select = (key->get_input_state__GBX__(INPUT_MY_ID_SELECT) != 0) ? 1 : 0;
 					uint8_t b_b = (key->get_input_state__GBX__(INPUT_MY_ID_B) != 0) ? 1 : 0;
 					uint8_t b_a = (key->get_input_state__GBX__(INPUT_MY_ID_A) != 0) ? 1 : 0;
-
+	
 					read_value = (gbx_ram.RAM[0xFF00] & 0b00110000);
 					read_value |= ((~((b_start << 3) | (b_select << 2) | (b_b << 1) | b_a)) & 0b00001111);
 				}
@@ -915,16 +915,16 @@ private:
 				read_value = gbx_ram.RAM[read_address];
 			}
 		}
-
+	
 		return read_value;
 	}
-
+	
 	uint16_t read_RAM_16bit(uint16_t read_address) {
 		//return (gbx_ram.RAM[read_address] | (gbx_ram.RAM[read_address + 1] << 8));
-
+	
 		return (read_RAM_8bit(read_address) | (read_RAM_8bit(read_address + 1) << 8));
 	}
-
+	
 	void write_RAM_8bit(uint16_t write_address, uint8_t value) {
 		if (booting_flag == true && write_address < 0x100) {//ブートロム中かつブートロム内のとき
 			bootrom_256byte[write_address] = value;
@@ -982,7 +982,7 @@ private:
 			else if (write_address <= 0x3FFF) {//ROMバンク番号
 				//M_debug_printf("write_address <= 0x3FFF [value = 0x%02x]\n", value);
 				//system("pause");
-
+	
 				if (cart_mbc_type == CART_MBC_TYPE::ROM ||
 					cart_mbc_type == CART_MBC_TYPE::OTHER ||
 					cart_mbc_type == CART_MBC_TYPE::MBC1)
@@ -1029,8 +1029,8 @@ private:
 			else if (write_address <= 0x5FFF) {//RAMバンク番号-または-ROMバンク番号の上位ビット
 				//M_debug_printf("write_address <= 0x5FFF [value = 0x%02x]\n", value);
 				//system("pause");
-
-
+	
+	
 				if (cart_mbc_type == CART_MBC_TYPE::ROM ||
 					cart_mbc_type == CART_MBC_TYPE::OTHER ||
 					cart_mbc_type == CART_MBC_TYPE::MBC1)
@@ -1052,7 +1052,7 @@ private:
 					}
 					else if (value <= 0x0C) {
 						bank_mode = BankMode::RTC;
-
+	
 						if (value == 0x08) {
 							clock_type__mbc3 = CLOCK_TYPE__MBC3::SECONDS;
 						}
@@ -1082,7 +1082,7 @@ private:
 			else if (write_address <= 0x7FFF) {//ROM / RAMモード選択
 				//M_debug_printf("write_address <= 0x7FFF [value = 0x%02x]\n", value);
 				//system("pause");
-
+	
 				if (cart_mbc_type == CART_MBC_TYPE::ROM ||
 					cart_mbc_type == CART_MBC_TYPE::OTHER ||
 					cart_mbc_type == CART_MBC_TYPE::MBC1)
@@ -1112,7 +1112,7 @@ private:
 			}
 			else if (0xA000 <= write_address && write_address <= 0xBFFF) {//RAMバンク00-03（存在する場合）
 				//gbx_ram.RAM[write_address] = value;
-
+	
 				if (cart_mbc_type == CART_MBC_TYPE::HuC1 && bank_mode == BankMode::IR) {//ROMのタイプがHuC1かつIRモードのとき
 					if (value == 0x00) {
 						IR_Enable_Flag = false;
@@ -1135,7 +1135,7 @@ private:
 			else if (write_address == 0xFF46) {//DMA
 				uint16_t src_address = value << 8;
 				memcpy((void*)(&(gbx_ram.RAM[0xFE00])), (void*)(&(gbx_ram.RAM[src_address])), 40 * 4);
-
+	
 				//サイクル数はすすめない //cpu_machine_cycle += 160;//160 M-cycle かかる
 			}
 			else {//通常書き込み
@@ -1143,11 +1143,11 @@ private:
 			}
 		}
 	}
-
+	
 	void write_RAM_16bit(uint16_t write_address, uint16_t value) {
 		//gbx_ram.RAM[write_address] = (uint8_t)(value & 0b0000000011111111);
 		//gbx_ram.RAM[write_address + 1] = (uint8_t)(value >> 8);
-
+	
 		write_RAM_8bit(write_address, (uint8_t)(value & 0b0000000011111111));
 		write_RAM_8bit(write_address + 1, (uint8_t)(value >> 8));
 	}
@@ -4351,10 +4351,12 @@ private:
 
 		IME_Flag = false;
 
-		rom_bank_no__low = 0;
+		rom_bank_no__low = 1;//初期はバンク1を指すようにする
 		rom_bank_no__high = 0;
 		sram_bank_no = 0;
 		SRAM_Enable_Flag = false;
+		RTC_Enable_Flag = false;
+		IR_Enable_Flag = false;
 		bank_mode = BankMode::ROM;
 	}
 
