@@ -30,8 +30,8 @@ TCHAR Main::ROMFilePath[] = {0};
 
 bool Main::ROM_loaded_flag = false;
 uint8_t Main::Cartridge_Type = 0;
-uint8_t Main::PGM_size = 0;
-uint8_t Main::RAM_type = 0;
+uint32_t Main::PGM_size = 0;
+uint32_t Main::SRAM_size = 0;
 
 bool Main::Show_FPS_Flag = true;
 
@@ -473,8 +473,96 @@ LRESULT CALLBACK WinProc(HWND h_wnd, UINT u_msg, WPARAM w_param, LPARAM l_param)
 			return 0;
 		case ID_40006:
 			if (Main::ROM_loaded_flag == true) {
+				char cart_type_name[256];
+				if (Main::Cartridge_Type == 0x00) {
+					strcpy_s(cart_type_name, 256, "ROM ONLY");
+				}
+				else if (Main::Cartridge_Type == 0x01) {
+					strcpy_s(cart_type_name, 256, "MBC1");
+				}
+				else if (Main::Cartridge_Type == 0x02) {
+					strcpy_s(cart_type_name, 256, "MBC1+RAM");
+				}
+				else if (Main::Cartridge_Type == 0x03) {
+					strcpy_s(cart_type_name, 256, "MBC1+RAM+BATTERY");
+				}
+				else if (Main::Cartridge_Type == 0x05) {
+					strcpy_s(cart_type_name, 256, "MBC2");
+				}
+				else if (Main::Cartridge_Type == 0x06) {
+					strcpy_s(cart_type_name, 256, "MBC2+BATTERY");
+				}
+				else if (Main::Cartridge_Type == 0x08) {
+					strcpy_s(cart_type_name, 256, "ROM+RAM 1");
+				}
+				else if (Main::Cartridge_Type == 0x09) {
+					strcpy_s(cart_type_name, 256, "ROM+RAM+BATTERY 1");
+				}
+				else if (Main::Cartridge_Type == 0x0B) {
+					strcpy_s(cart_type_name, 256, "MMM01");
+				}
+				else if (Main::Cartridge_Type == 0x0C) {
+					strcpy_s(cart_type_name, 256, "MMM01+RAM");
+				}
+				else if (Main::Cartridge_Type == 0x0D) {
+					strcpy_s(cart_type_name, 256, "MMM01+RAM+BATTERY");
+				}
+				else if (Main::Cartridge_Type == 0x0F) {
+					strcpy_s(cart_type_name, 256, "MBC3+TIMER+BATTERY");
+				}
+				else if (Main::Cartridge_Type == 0x10) {
+					strcpy_s(cart_type_name, 256, "MBC3+TIMER+RAM+BATTERY 2");
+				}
+				else if (Main::Cartridge_Type == 0x11) {
+					strcpy_s(cart_type_name, 256, "MBC3");
+				}
+				else if (Main::Cartridge_Type == 0x12) {
+					strcpy_s(cart_type_name, 256, "MBC3+RAM 2");
+				}
+				else if (Main::Cartridge_Type == 0x13) {
+					strcpy_s(cart_type_name, 256, "MBC3+RAM+BATTERY 2");
+				}
+				else if (Main::Cartridge_Type == 0x19) {
+					strcpy_s(cart_type_name, 256, "MBC5");
+				}
+				else if (Main::Cartridge_Type == 0x1A) {
+					strcpy_s(cart_type_name, 256, "MBC5+RAM");
+				}
+				else if (Main::Cartridge_Type == 0x1B) {
+					strcpy_s(cart_type_name, 256, "MBC5+RAM+BATTERY");
+				}
+				else if (Main::Cartridge_Type == 0x1C) {
+					strcpy_s(cart_type_name, 256, "MBC5+RUMBLE");
+				}
+				else if (Main::Cartridge_Type == 0x1D) {
+					strcpy_s(cart_type_name, 256, "MBC5+RUMBLE+RAM");
+				}
+				else if (Main::Cartridge_Type == 0x1E) {
+					strcpy_s(cart_type_name, 256, "MBC5+RUMBLE+RAM+BATTERY");
+				}
+				else if (Main::Cartridge_Type == 0x20) {
+					strcpy_s(cart_type_name, 256, "MBC6");
+				}
+				else if (Main::Cartridge_Type == 0x22) {
+					strcpy_s(cart_type_name, 256, "MBC7+SENSOR+RUMBLE+RAM+BATTERY");
+				}
+				else if (Main::Cartridge_Type == 0xFC) {
+					strcpy_s(cart_type_name, 256, "POCKET CAMERA");
+				}
+				else if (Main::Cartridge_Type == 0xFD) {
+					strcpy_s(cart_type_name, 256, "BANDAI TAMA5");
+				}
+				else if (Main::Cartridge_Type == 0xFE) {
+					strcpy_s(cart_type_name, 256, "HuC3");
+				}
+				else if (Main::Cartridge_Type == 0xFF) {
+					strcpy_s(cart_type_name, 256, "HuC1+RAM+BATTERY");
+				}
+				else {
+					strcpy_s(cart_type_name, 256, "UNKNOWN");
+				}
 				char tmp_str_buffer[512];
-				sprintf_s(tmp_str_buffer, "カードリッジのタイプ : %02x\nプログラムROMサイズ : %dKB\nRAMの種類 : %02x", Main::Cartridge_Type, (32 << (Main::PGM_size)), Main::RAM_type);
+				sprintf_s(tmp_str_buffer, "カードリッジのタイプ : %s\nプログラムROMサイズ : %dKB\nSRAMのサイズ : %dKB", cart_type_name, Main::PGM_size, Main::SRAM_size);
 				MessageBox(NULL, _T(tmp_str_buffer), _T("ROM情報"), MB_ICONINFORMATION);
 			}
 			else {

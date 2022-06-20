@@ -678,8 +678,8 @@ private:
 		uint8_t CGB_Flag;
 		uint8_t SGB_Flag;
 		uint8_t Cartridge_Type;
-		uint8_t ROM_Size;
-		uint8_t RAM_Size;
+		uint8_t ROM_Type;
+		uint8_t SRAM_Type;
 	};
 	ROM_INFO rom_info;
 
@@ -752,6 +752,7 @@ private:
 	GBX_RAM gbx_ram;
 
 	uint8_t* ROM_bank_data_ptr;//ROMが32KB以上のときに使うやつ
+	uint8_t* SRAM_bank_data_ptr;//RAMが8KB以上のときに使うやつ
 
 	bool IME_Flag = false;
 
@@ -1032,8 +1033,8 @@ private:
 
 	//未定義のCPUの命令
 	void cpu_fnc__GARBAGE() {
-		M_debug_printf("ERROR cpu_fnc__GARBAGE()...\n");
-		MessageBox(NULL, _T("未定義の命令を実行しました"), _T("情報"), MB_ICONERROR);
+		//M_debug_printf("ERROR cpu_fnc__GARBAGE()...\n");
+		//MessageBox(NULL, _T("未定義の命令を実行しました"), _T("情報"), MB_ICONERROR);
 	}
 
 
@@ -4049,17 +4050,6 @@ private:
 		gbx_register.SP = 0x0000;
 		gbx_register.PC = 0x0000;
 
-		////gbx_register.A = 0x11;
-		////gbx_register.Flags = 0x80;
-		////gbx_register.B = 0x00;
-		////gbx_register.C = 0x00;
-		////gbx_register.D = 0xFF;
-		////gbx_register.E = 0x56;
-		////gbx_register.H = 0x00;
-		////gbx_register.L = 0x0D;
-		////gbx_register.SP = 0xFFFE;
-		////gbx_register.PC = 0x0100;
-
 		//gbx_register.A = 0x01;
 		//gbx_register.Flags = 0xB0;
 		//gbx_register.B = 0x00;
@@ -4127,25 +4117,24 @@ private:
 		if (fseek(rom_fp, 0x148, SEEK_SET) != 0) {
 			goto read_rom_error;
 		}
-		if (fread(&(rom_info.ROM_Size), sizeof(uint8_t), 1, rom_fp) != 1) {
+		if (fread(&(rom_info.ROM_Type), sizeof(uint8_t), 1, rom_fp) != 1) {
 			goto read_rom_error;
 		}
-		Main::PGM_size = rom_info.ROM_Size;
+		Main::PGM_size = (32 << rom_info.ROM_Type);
 
 		if (fseek(rom_fp, 0x149, SEEK_SET) != 0) {
 			goto read_rom_error;
 		}
-		if (fread(&(rom_info.RAM_Size), sizeof(uint8_t), 1, rom_fp) != 1) {
+		if (fread(&(rom_info.SRAM_Type), sizeof(uint8_t), 1, rom_fp) != 1) {
 			goto read_rom_error;
 		}
-		Main::RAM_type = rom_info.RAM_Size;
 
 		M_debug_printf("################################\n");
 		M_debug_printf("CGB_Flag = 0x%02x\n", rom_info.CGB_Flag);
 		M_debug_printf("SGB_Flag = 0x%02x\n", rom_info.SGB_Flag);
 		M_debug_printf("Cartridge_Type = 0x%02x\n", rom_info.Cartridge_Type);
-		M_debug_printf("ROM_Size = 0x%02x\n", rom_info.ROM_Size);
-		M_debug_printf("RAM_Size = 0x%02x\n", rom_info.RAM_Size);
+		M_debug_printf("ROM_Type = 0x%02x\n", rom_info.ROM_Type);
+		M_debug_printf("SRAM_Type = 0x%02x\n", rom_info.SRAM_Type);
 		M_debug_printf("################################\n");
 
 		if (fseek(rom_fp, 0x0, SEEK_SET) != 0) {
@@ -4155,16 +4144,60 @@ private:
 			goto read_rom_error;
 		}
 
-		if ((32 << rom_info.ROM_Size) > 32) {//ROMが32KBより大きいときはバンクを使う
-			const size_t ROM_BANK_DATA_SIZE = 1024 * ((32 << rom_info.ROM_Size) - 32);
+		if (0x08 < rom_info.ROM_Type) {//0x09以降は未対応
+			goto read_rom_error;
+		}
+
+		if (Main::PGM_size > 32) {//ROMが32KBより大きいときはバンクを使う
+			const size_t ROM_BANK_DATA_SIZE = 1024 * (Main::PGM_size - 32);
 
 			ROM_bank_data_ptr = (uint8_t*)malloc(ROM_BANK_DATA_SIZE);
+			if (ROM_bank_data_ptr == NULL) {
+				goto read_rom_error;
+			}
 
 			if (fread(ROM_bank_data_ptr, sizeof(uint8_t), ROM_BANK_DATA_SIZE, rom_fp) != ROM_BANK_DATA_SIZE) {
 				goto read_rom_error;
 			}
 		}
 
+		if (rom_info.SRAM_Type == 0) {//RAM無し
+			//なにもしない
+			Main::SRAM_size = 0;
+		}
+		else if (rom_info.SRAM_Type == 1) {//不使用
+			//なにもしない
+			Main::SRAM_size = 0;
+		}
+		else if (rom_info.SRAM_Type == 2) {//8 KB (1バンク)
+			//1バンクなので追加の領域は必要ない
+			Main::SRAM_size = 8;
+		}
+		else if (rom_info.SRAM_Type == 3) {//32 KB (4バンク)
+			Main::SRAM_size = 32;
+		}
+		else if (rom_info.SRAM_Type == 4) {//128 KB (16バンク)
+			Main::SRAM_size = 128;
+		}
+		else if (rom_info.SRAM_Type == 5) {//64 KB (8バンク)
+			Main::SRAM_size = 64;
+		}
+		else {//それ以外は未対応
+			goto read_rom_error;
+		}
+
+		if (Main::SRAM_size > 8) {
+			const size_t SRAM_BANK_DATA_SIZE = 1024 * (Main::SRAM_size - 8);
+
+			SRAM_bank_data_ptr = (uint8_t*)malloc(SRAM_BANK_DATA_SIZE);
+			if (SRAM_bank_data_ptr == NULL) {
+				goto read_rom_error;
+			}
+
+			memset(SRAM_bank_data_ptr, 0, SRAM_BANK_DATA_SIZE);
+		}
+
+		fclose(rom_fp);
 
 		return 0;
 
@@ -4904,6 +4937,7 @@ public:
 
 	~GBX() {
 		free(ROM_bank_data_ptr);
+		free(SRAM_bank_data_ptr);
 	}
 
 	bool get_FATAL_ERROR_FLAG() {
@@ -4951,12 +4985,18 @@ public:
 
 			if (booting_flag == true && gbx_register.PC == 0x100) {
 				booting_flag = false;//ブートロム終了
+
+				//M_debug_printf("PC:0x%04x [命令:0x%02x] A:0x%02x, BC:0x%04x, DE:0x%04x, HL:0x%04x, Flags:0x%02x, SP:0x%04x\n",
+				//	gbx_register.PC, instruction_code, gbx_register.A, gbx_register.BC, gbx_register.DE, gbx_register.HL, gbx_register.Flags, gbx_register.SP);
+				//system("pause");
 			}
 
 			uint32_t instruction_machine_cycle = instruction_machine_cycle_table[instruction_code];
 			if (instruction_machine_cycle == 0xDEADBEEF) {
 				M_debug_printf("ERROR 未定義の命令を実行しました[PC:0x%04x, コード:0x%02x]\n", gbx_register.PC, instruction_code);
 				MessageBox(NULL, _T("未定義の命令を実行しました"), _T("情報"), MB_ICONERROR);
+
+				FATAL_ERROR_FLAG = true;
 			}
 
 			cpu_machine_cycle += instruction_machine_cycle;//割り込みした場合はそのサイクル数も加算してある
@@ -5024,3 +5064,4 @@ public:
 
 	}
 };
+

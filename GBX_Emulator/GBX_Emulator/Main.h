@@ -14,8 +14,8 @@ public:
 
 	static bool ROM_loaded_flag;
 	static uint8_t Cartridge_Type;
-	static uint8_t PGM_size;
-	static uint8_t RAM_type;
+	static uint32_t PGM_size;
+	static uint32_t SRAM_size;
 
 	static bool Show_FPS_Flag;
 };
