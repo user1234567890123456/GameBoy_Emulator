@@ -3,6 +3,11 @@
 音は未実装です  
 動作しないソフトは多分あります  
 <br>
+# 実行可能ファイルについて
+著作権の関係上実行可能ファイルは256バイトのbootromのバイナリファイルをどこかしらで手に入れて  
+"bootrom/bootrom_256byte.bin" となるようにしてから自分でビルドしてください  
+ビルドしてできた実行可能ファイルをExecutableディレクトリに入れると実行できます  
+<br>
 # スクリーンショット
 ![pass1](https://user-images.githubusercontent.com/81889210/174439512-d6ad670e-81be-434f-9c57-06d0483070ae.png)
 ![pass2](https://user-images.githubusercontent.com/81889210/174439513-68b1af2c-ffda-496d-83a1-8fcd802641f9.png)
