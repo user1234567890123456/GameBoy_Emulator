@@ -9,3 +9,13 @@
 ビルドしてできた実行可能ファイルをExecutableディレクトリに入れると実行できます  
 <br>
 # スクリーンショット
+![test1](https://user-images.githubusercontent.com/81889210/174856907-d61784b3-cdc0-45e4-91ec-a52b95e06c6d.png)
+![test2](https://user-images.githubusercontent.com/81889210/174856910-fc305b74-d514-4428-981c-b12eded3c597.png)
+![hosi1](https://user-images.githubusercontent.com/81889210/174856895-d5ca0cb0-2c12-46d0-9670-36583d5aa33d.png)
+![hosi2](https://user-images.githubusercontent.com/81889210/174856899-448beec8-4e01-45fa-b945-9ef50892512e.png)
+![hosi3](https://user-images.githubusercontent.com/81889210/174856905-bb965a7a-534b-4c9e-b695-9f10d0d6ff4a.png)
+![zel1](https://user-images.githubusercontent.com/81889210/174856911-767c5ee4-9147-4eb2-a1bc-febc67b43a86.png)
+![zel2](https://user-images.githubusercontent.com/81889210/174856913-9670cc09-9b6d-45b8-a01b-12a86e13c6e4.png)
+![zel3](https://user-images.githubusercontent.com/81889210/174856915-145414fe-d90e-4841-bcd2-5b900bfd49b9.png)
+![zel4](https://user-images.githubusercontent.com/81889210/174856917-acf9ea0a-3997-4f55-bb7b-898e77ab1f94.png)
+![zel5](https://user-images.githubusercontent.com/81889210/174856918-4c092341-41e2-4dda-9497-35998a014e98.png)
