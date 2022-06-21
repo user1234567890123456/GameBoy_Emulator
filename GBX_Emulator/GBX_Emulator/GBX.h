@@ -868,7 +868,7 @@ private:
 				if (cart_mbc_type == CART_MBC_TYPE::MBC3 && bank_mode == BankMode::RTC) {//MBC3でRTC読み取りのとき
 					/*
 					TODO
-					時間の読み取りを実装する
+					RTCレジスタの読み取りを実装する
 					*/
 					read_value = 0x00;
 				}
@@ -988,7 +988,7 @@ private:
 					cart_mbc_type == CART_MBC_TYPE::MBC1)
 				{
 					rom_bank_no__low = (value & 0b00011111);
-					if (rom_bank_no__low == 0) {
+					if (rom_bank_no__low == 0 && (!(bank_mode == BankMode::ROM && rom_bank_no__high != 0))) {
 						rom_bank_no__low = 1;
 					}
 				}
@@ -1100,7 +1100,7 @@ private:
 				else if (cart_mbc_type == CART_MBC_TYPE::MBC3) {
 					/*
 					TODO
-					時間の書き込みを実装する
+					現在の時刻の保存を実装する
 					*/
 				}
 				else if (cart_mbc_type == CART_MBC_TYPE::MBC5) {
@@ -1112,8 +1112,14 @@ private:
 			}
 			else if (0xA000 <= write_address && write_address <= 0xBFFF) {//RAMバンク00-03（存在する場合）
 				//gbx_ram.RAM[write_address] = value;
-	
-				if (cart_mbc_type == CART_MBC_TYPE::HuC1 && bank_mode == BankMode::IR) {//ROMのタイプがHuC1かつIRモードのとき
+
+				if (cart_mbc_type == CART_MBC_TYPE::MBC3 && bank_mode == BankMode::RTC) {//ROMのタイプがMBC3かつRTCモードのとき
+					/*
+					TODO
+					RTCレジスタへの書き込みを実装する
+					*/
+				}
+				else if (cart_mbc_type == CART_MBC_TYPE::HuC1 && bank_mode == BankMode::IR) {//ROMのタイプがHuC1かつIRモードのとき
 					if (value == 0x00) {
 						IR_Enable_Flag = false;
 					}
