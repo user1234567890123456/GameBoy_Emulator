@@ -257,7 +257,7 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR command
 	My_Random::_make_singleton();
 
 	Key key;
-	GameManager game_manager(&myDirectXSystem, &key/*, sprite*/);
+	GameManager* game_manager = new GameManager(&myDirectXSystem, &key/*, sprite*/);
 
 	Fps fps(&myDirectXSystem/*, sprite*/);
 
@@ -340,7 +340,7 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR command
 
 				key.key_state_update();
 
-				game_manager.execute_game_process();
+				game_manager->execute_game_process();
 
 				//######################################################################################################
 				//#
@@ -391,6 +391,8 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR command
 	/*
 	‚¢‚ë‚¢‚ë‰ð•ú‚·‚é
 	*/
+
+	delete game_manager;
 
 	My_Input::_delete_singleton();
 

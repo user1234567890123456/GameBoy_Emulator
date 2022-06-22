@@ -1,8 +1,12 @@
 #pragma once
 
+using namespace std;
 
 #include <vector>
-using namespace std;
+
+#include <io.h>
+#pragma comment(lib, "shlwapi.lib")
+#include <shlwapi.h>
 
 #include "Main.h"
 #include "Key.h"
@@ -19,6 +23,10 @@ class GBX
 private:
 
 	bool FATAL_ERROR_FLAG = false;//ロードなどで続行不能なエラーが発生したか
+
+
+#define SAVEDATA_FILE_EXT_NAME ".savdat"
+	FILE* savedata_fp;
 
 
 #define BOOT_ROM_SIZE 0x100
@@ -848,6 +856,17 @@ private:
 		}
 	}
 
+	uint8_t* getMBC2_RAM_address(uint16_t address) {
+		/*
+		A000-A1FF -> 512x4ビットの RAM
+		A200-BFFF -> A000-A1FFのミラー
+		*/
+		uint16_t relative_address = address - 0xA000;
+		relative_address %= 0x200;//A000-A1FFの範囲に変換する
+
+		return (uint8_t*)(&(gbx_ram.RAM[0xA000]) + relative_address);
+	}
+
 	uint8_t read_RAM_8bit(uint16_t read_address) {
 		uint8_t read_value = 0x00;
 	
@@ -865,7 +884,10 @@ private:
 				read_value = read_ROM_address[read_address - 0x4000];
 			}
 			else if (0xA000 <= read_address && read_address <= 0xBFFF) {//RAMバンク00-03（存在する場合）
-				if (cart_mbc_type == CART_MBC_TYPE::MBC3 && bank_mode == BankMode::RTC) {//MBC3でRTC読み取りのとき
+				if (cart_mbc_type == CART_MBC_TYPE::MBC2) {//MBC2のとき
+					read_value = *(getMBC2_RAM_address(read_address));
+				}
+				else if (cart_mbc_type == CART_MBC_TYPE::MBC3 && bank_mode == BankMode::RTC) {//MBC3でRTC読み取りのとき
 					/*
 					TODO
 					RTCレジスタの読み取りを実装する
@@ -1113,7 +1135,10 @@ private:
 			else if (0xA000 <= write_address && write_address <= 0xBFFF) {//RAMバンク00-03（存在する場合）
 				//gbx_ram.RAM[write_address] = value;
 
-				if (cart_mbc_type == CART_MBC_TYPE::MBC3 && bank_mode == BankMode::RTC) {//ROMのタイプがMBC3かつRTCモードのとき
+				if (cart_mbc_type == CART_MBC_TYPE::MBC2) {//MBC2のとき
+					*(getMBC2_RAM_address(write_address)) = value;
+				}
+				else if (cart_mbc_type == CART_MBC_TYPE::MBC3 && bank_mode == BankMode::RTC) {//ROMのタイプがMBC3かつRTCモードのとき
 					/*
 					TODO
 					RTCレジスタへの書き込みを実装する
@@ -1149,7 +1174,7 @@ private:
 			}
 		}
 	}
-	
+
 	void write_RAM_16bit(uint16_t write_address, uint16_t value) {
 		//gbx_ram.RAM[write_address] = (uint8_t)(value & 0b0000000011111111);
 		//gbx_ram.RAM[write_address + 1] = (uint8_t)(value >> 8);
@@ -1157,6 +1182,171 @@ private:
 		write_RAM_8bit(write_address, (uint8_t)(value & 0b0000000011111111));
 		write_RAM_8bit(write_address + 1, (uint8_t)(value >> 8));
 	}
+
+
+	//====================================================
+	//====================================================
+
+	void create_savedata_file(const char* savedata_filename) {
+		bool file_exist_flag = false;
+		if (PathFileExists(savedata_filename) == TRUE) {//ファイルが存在した場合
+			file_exist_flag = true;
+		}
+
+		if (fopen_s(&savedata_fp, savedata_filename, "ab+") != 0) {
+			goto create_gamedata_error;
+		}
+
+		if (file_exist_flag == false) {//セーブデータファイルを新規作成した場合
+			save_gamedata();//初期の状態をセーブする
+		}
+
+		fseek(savedata_fp, 0, SEEK_SET);//ファイルのカーソルを先頭に持ってくる
+
+		return;
+
+	create_gamedata_error:
+		MessageBox(NULL, _T("セーブデータファイルの作成に失敗しました"), _T("ERROR"), MB_OK | MB_ICONERROR);
+
+		FATAL_ERROR_FLAG = true;
+	}
+
+	/*
+	ゲームのデータをファイルに保存する
+	*/
+	void save_gamedata() {
+		if (Main::SRAM_size == 0) {//SRAMのサイズが0のとき
+			return;
+		}
+
+		//ファイルのサイズを0にする
+		int file_handle = _fileno(savedata_fp);
+		if (_chsize_s(file_handle, 0) != 0) {
+			goto save_gamedata_error;
+		}
+
+		fseek(savedata_fp, 0, SEEK_SET);//ファイルのカーソルを先頭に持ってくる
+
+		size_t tmp_write_size;
+		if (cart_mbc_type == CART_MBC_TYPE::ROM ||
+			cart_mbc_type == CART_MBC_TYPE::MBC1 ||
+			cart_mbc_type == CART_MBC_TYPE::MBC5 ||
+			cart_mbc_type == CART_MBC_TYPE::HuC1)
+		{
+			tmp_write_size = 0x2000;
+			if (fwrite(&(gbx_ram.RAM[0xA000]), 1, tmp_write_size, savedata_fp) != tmp_write_size) {
+				goto save_gamedata_error;
+			}
+			if (Main::SRAM_size > 8) {
+				tmp_write_size = ((Main::SRAM_size - 8) * 1024);
+				if (fwrite(SRAM_bank_data_ptr, 1, tmp_write_size, savedata_fp) != tmp_write_size) {
+					goto save_gamedata_error;
+				}
+			}
+		}
+		else if (cart_mbc_type == CART_MBC_TYPE::MBC2) {
+			tmp_write_size = 0x200;
+			if (fwrite(&(gbx_ram.RAM[0xA000]), 1, tmp_write_size, savedata_fp) != tmp_write_size) {
+				goto save_gamedata_error;
+			}
+		}
+		else if (cart_mbc_type == CART_MBC_TYPE::MBC3) {
+			tmp_write_size = 0x2000;
+			if (fwrite(&(gbx_ram.RAM[0xA000]), 1, tmp_write_size, savedata_fp) != tmp_write_size) {
+				goto save_gamedata_error;
+			}
+			if (Main::SRAM_size > 8) {
+				tmp_write_size = ((Main::SRAM_size - 8) * 1024);
+				if (fwrite(SRAM_bank_data_ptr, 1, tmp_write_size, savedata_fp) != tmp_write_size) {
+					goto save_gamedata_error;
+				}
+			}
+
+			/*
+			TODO
+			RTCレジスタの保存を実装する
+			*/
+		}
+		//else if (cart_mbc_type == CART_MBC_TYPE::OTHER) {
+		else {//OTHER
+			//このエミュレータでは対応していないので何もしない
+		}
+
+		return;
+
+	save_gamedata_error:
+		MessageBox(NULL, _T("セーブデータの保存に失敗しました"), _T("ERROR"), MB_OK | MB_ICONERROR);
+
+		FATAL_ERROR_FLAG = true;
+	}
+
+	void load_gamedata() {
+		if (Main::SRAM_size == 0) {//SRAMのサイズが0のとき
+			return;
+		}
+
+		fseek(savedata_fp, 0, SEEK_SET);//ファイルのカーソルを先頭に持ってくる
+
+		size_t tmp_read_size;
+
+		if (cart_mbc_type == CART_MBC_TYPE::ROM ||
+			cart_mbc_type == CART_MBC_TYPE::MBC1 ||
+			cart_mbc_type == CART_MBC_TYPE::MBC5 ||
+			cart_mbc_type == CART_MBC_TYPE::HuC1)
+		{
+			tmp_read_size = 0x2000;
+			if (fread(&(gbx_ram.RAM[0xA000]), 1, tmp_read_size, savedata_fp) != tmp_read_size) {
+				goto load_gamedata_error;
+			}
+			if (Main::SRAM_size > 8) {
+				tmp_read_size = ((Main::SRAM_size - 8) * 1024);
+				if (fread(SRAM_bank_data_ptr, 1, tmp_read_size, savedata_fp) != tmp_read_size) {
+					goto load_gamedata_error;
+				}
+			}
+		}
+		else if (cart_mbc_type == CART_MBC_TYPE::MBC2) {
+			tmp_read_size = 0x200;
+			if (fread(&(gbx_ram.RAM[0xA000]), 1, tmp_read_size, savedata_fp) != tmp_read_size) {
+				goto load_gamedata_error;
+			}
+		}
+		else if (cart_mbc_type == CART_MBC_TYPE::MBC3) {
+			tmp_read_size = 0x2000;
+			if (fread(&(gbx_ram.RAM[0xA000]), 1, tmp_read_size, savedata_fp) != tmp_read_size) {
+				goto load_gamedata_error;
+			}
+			if (Main::SRAM_size > 8) {
+				tmp_read_size = ((Main::SRAM_size - 8) * 1024);
+				if (fread(SRAM_bank_data_ptr, 1, tmp_read_size, savedata_fp) != tmp_read_size) {
+					goto load_gamedata_error;
+				}
+			}
+
+			/*
+			TODO
+			RTCレジスタの読み込みを実装する
+			*/
+		}
+		//else if (cart_mbc_type == CART_MBC_TYPE::OTHER) {
+		else {//OTHER
+			//このエミュレータでは対応していないので何もしない
+		}
+
+		return;
+
+	load_gamedata_error:
+		MessageBox(NULL, _T("セーブデータの読み込みに失敗しました"), _T("ERROR"), MB_OK | MB_ICONERROR);
+
+		FATAL_ERROR_FLAG = true;
+	}
+
+	void close_savedata_file() {
+		fclose(savedata_fp);
+	}
+
+	//====================================================
+	//====================================================
 
 	void push_8bit(uint8_t value) {
 		gbx_register.SP--;
@@ -5284,6 +5474,19 @@ public:
 		init_util();
 		init_bootrom();
 
+		size_t savedata_filename_size = strlen(rom_filename) + strlen(SAVEDATA_FILE_EXT_NAME) + 1;
+		char* savedata_filename = (char*)malloc(savedata_filename_size);
+		if (savedata_filename == NULL) {
+			goto gbx_init_error;
+		}
+		memset(savedata_filename, 0x00, savedata_filename_size);
+		memcpy(savedata_filename, rom_filename, strlen(rom_filename));
+		memcpy((char*)(savedata_filename + strlen(rom_filename)), SAVEDATA_FILE_EXT_NAME, strlen(SAVEDATA_FILE_EXT_NAME));
+		create_savedata_file(savedata_filename);
+		free(savedata_filename);
+		load_gamedata();
+
+
 		Main::ROM_loaded_flag = true;
 
 		booting_flag = true;
@@ -5306,6 +5509,9 @@ public:
 	}
 
 	~GBX() {
+		save_gamedata();
+		close_savedata_file();
+
 		free(ROM_bank_data_ptr);
 		free(SRAM_bank_data_ptr);
 	}
