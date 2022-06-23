@@ -19,3 +19,4 @@
 ![zel3](https://user-images.githubusercontent.com/81889210/174856915-145414fe-d90e-4841-bcd2-5b900bfd49b9.png)
 ![zel4](https://user-images.githubusercontent.com/81889210/174856917-acf9ea0a-3997-4f55-bb7b-898e77ab1f94.png)
 ![zel5](https://user-images.githubusercontent.com/81889210/174856918-4c092341-41e2-4dda-9497-35998a014e98.png)
+![zel6](https://user-images.githubusercontent.com/81889210/175211918-1f616ecd-1d54-4103-a72e-54f506df3dca.png)
