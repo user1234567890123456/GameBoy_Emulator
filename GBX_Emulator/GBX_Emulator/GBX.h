@@ -3,6 +3,7 @@
 using namespace std;
 
 #include <vector>
+#include <algorithm>
 
 #include <io.h>
 #pragma comment(lib, "shlwapi.lib")
@@ -4993,6 +4994,8 @@ private:
 
 
 	struct Sprite_Info {
+		uint16_t address_index = 0x0000;
+
 		uint32_t x = 0;
 		uint32_t y = 0;
 		uint8_t tile_no = 0;
@@ -5001,6 +5004,11 @@ private:
 		bool sprite_reverse_x_flag = false;
 		bool palette_OBP1_flag = false;
 		bool size_8x16_flag = false;
+
+		//アドレスが大きい順に並べ替えるために使う比較関数
+		bool operator<(const Sprite_Info& right) const {
+			return (address_index < right.address_index) ? false : true;
+		}
 	};
 	vector<Sprite_Info> sprite_info_list;
 	void init_sprite_info_list() {
@@ -5026,16 +5034,18 @@ private:
 		for (int i = 0; i < 40; i++) {
 			Sprite_Info s_info;
 
+			s_info.address_index = (4 * i);//スプライト間の描画優先順位決定のためにアドレスのインデックスを保存しておく
+
 			/*
 			s_info.x, s_info.x はスクリーンの座標
 			*/
-			s_info.y = (gbx_ram.RAM[0xFE00 + (4 * (39 - i))] - 16);
-			s_info.x = (gbx_ram.RAM[0xFE00 + (4 * (39 - i)) + 1] - 8);
+			s_info.y = (gbx_ram.RAM[0xFE00 + (4 * i)] - 16);
+			s_info.x = (gbx_ram.RAM[0xFE00 + (4 * i) + 1] - 8);
 			if (!(pixel_x == s_info.x && pixel_y == s_info.y)) {
 				continue;
 			}
-			s_info.tile_no = gbx_ram.RAM[0xFE00 + (4 * (39 - i)) + 2];
-			uint8_t attribute = gbx_ram.RAM[0xFE00 + (4 * (39 - i)) + 3];
+			s_info.tile_no = gbx_ram.RAM[0xFE00 + (4 * i) + 2];
+			uint8_t attribute = gbx_ram.RAM[0xFE00 + (4 * i) + 3];
 
 			s_info.sprite_max_priority_flag = ((attribute & 0b10000000) != 0) ? false : true;
 			s_info.sprite_reverse_y_flag = ((attribute & 0b01000000) != 0) ? true : false;
@@ -5055,6 +5065,15 @@ private:
 	}
 
 	void draw_screenbuffer_sprite_data() {
+		//M_debug_printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+		//for (int k = 0; k < sprite_info_list.size(); k++) {
+		//	M_debug_printf("BEF sprite_info_list[%d].address_index = 0x%04x\n", k, sprite_info_list[k].address_index);
+		//}
+		sort(sprite_info_list.begin(), sprite_info_list.end());
+		//for (int k = 0; k < sprite_info_list.size(); k++) {
+		//	M_debug_printf("AFT sprite_info_list[%d].address_index = 0x%04x\n", k, sprite_info_list[k].address_index);
+		//}
+
 		for (int i = 0; i < sprite_info_list.size(); i++) {
 			Sprite_Info s_info = sprite_info_list[i];
 
