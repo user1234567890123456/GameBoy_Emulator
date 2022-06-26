@@ -1,4 +1,4 @@
-# GameBoy_X_Emulator
+# GameBoy_Emulator
 ゲームボーイのエミュレーターです  
 音は未実装です  
 動作しないソフトは多分あります  
