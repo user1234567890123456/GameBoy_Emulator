@@ -19,7 +19,7 @@ using namespace std;
 #define CPU_FREQ 4194304//CPUの周波数(hz)
 
 
-class GBX
+class GameBoy
 {
 private:
 
@@ -141,263 +141,263 @@ private:
 	uint8_t _8bit_sprite_screen_data_160x144[GBX_WIDTH * GBX_HEIGHT];
 
 
-	void (GBX::*cpu_instruction_table[INSTRUCTION_NUM])() = {
-			&GBX::cpu_fnc__NOP, //0x00
-			&GBX::cpu_fnc__LD_BC_n16, //0x01
-			&GBX::cpu_fnc__LD_addrBC_A, //0x02
-			&GBX::cpu_fnc__INC_BC, //0x03
-			&GBX::cpu_fnc__INC_B, //0x04
-			&GBX::cpu_fnc__DEC_B, //0x05
-			&GBX::cpu_fnc__LD_B_n8, //0x06
-			&GBX::cpu_fnc__RLCA, //0x07
-			&GBX::cpu_fnc__LD_addrn16_SP, //0x08
-			&GBX::cpu_fnc__ADD_HL_BC, //0x09
-			&GBX::cpu_fnc__LD_A_addrBC, //0x0a
-			&GBX::cpu_fnc__DEC_BC, //0x0b
-			&GBX::cpu_fnc__INC_C, //0x0c
-			&GBX::cpu_fnc__DEC_C, //0x0d
-			&GBX::cpu_fnc__LD_C_n8, //0x0e
-			&GBX::cpu_fnc__RRCA, //0x0f
-			&GBX::cpu_fnc__STOP, //0x10
-			&GBX::cpu_fnc__LD_DE_n16, //0x11
-			&GBX::cpu_fnc__LD_addrDE_A, //0x12
-			&GBX::cpu_fnc__INC_DE, //0x13
-			&GBX::cpu_fnc__INC_D, //0x14
-			&GBX::cpu_fnc__DEC_D, //0x15
-			&GBX::cpu_fnc__LD_D_n8, //0x16
-			&GBX::cpu_fnc__RLA, //0x17
-			&GBX::cpu_fnc__JR_e8, //0x18
-			&GBX::cpu_fnc__ADD_HL_DE, //0x19
-			&GBX::cpu_fnc__LD_A_addrDE, //0x1a
-			&GBX::cpu_fnc__DEC_DE, //0x1b
-			&GBX::cpu_fnc__INC_E, //0x1c
-			&GBX::cpu_fnc__DEC_E, //0x1d
-			&GBX::cpu_fnc__LD_E_n8, //0x1e
-			&GBX::cpu_fnc__RRA, //0x1f
-			&GBX::cpu_fnc__JR_FNZ_e8, //0x20
-			&GBX::cpu_fnc__LD_HL_n16, //0x21
-			&GBX::cpu_fnc__LD_addrHLI_A, //0x22
-			&GBX::cpu_fnc__INC_HL, //0x23
-			&GBX::cpu_fnc__INC_H, //0x24
-			&GBX::cpu_fnc__DEC_H, //0x25
-			&GBX::cpu_fnc__LD_H_n8, //0x26
-			&GBX::cpu_fnc__DAA, //0x27
-			&GBX::cpu_fnc__JR_FZ_e8, //0x28
-			&GBX::cpu_fnc__ADD_HL_HL, //0x29
-			&GBX::cpu_fnc__LD_A_addrHLI, //0x2a
-			&GBX::cpu_fnc__DEC_HL, //0x2b
-			&GBX::cpu_fnc__INC_L, //0x2c
-			&GBX::cpu_fnc__DEC_L, //0x2d
-			&GBX::cpu_fnc__LD_L_n8, //0x2e
-			&GBX::cpu_fnc__CPL, //0x2f
-			&GBX::cpu_fnc__JR_FNC_e8, //0x30
-			&GBX::cpu_fnc__LD_SP_n16, //0x31
-			&GBX::cpu_fnc__LD_addrHLD_A, //0x32
-			&GBX::cpu_fnc__INC_SP, //0x33
-			&GBX::cpu_fnc__INC_addrHL, //0x34
-			&GBX::cpu_fnc__DEC_addrHL, //0x35
-			&GBX::cpu_fnc__LD_addrHL_n8, //0x36
-			&GBX::cpu_fnc__SCF, //0x37
-			&GBX::cpu_fnc__JR_FC_e8, //0x38
-			&GBX::cpu_fnc__ADD_HL_SP, //0x39
-			&GBX::cpu_fnc__LD_A_addrHLD, //0x3a
-			&GBX::cpu_fnc__DEC_SP, //0x3b
-			&GBX::cpu_fnc__INC_A, //0x3c
-			&GBX::cpu_fnc__DEC_A, //0x3d
-			&GBX::cpu_fnc__LD_A_n8, //0x3e
-			&GBX::cpu_fnc__CCF, //0x3f
-			&GBX::cpu_fnc__LD_B_B, //0x40
-			&GBX::cpu_fnc__LD_B_C, //0x41
-			&GBX::cpu_fnc__LD_B_D, //0x42
-			&GBX::cpu_fnc__LD_B_E, //0x43
-			&GBX::cpu_fnc__LD_B_H, //0x44
-			&GBX::cpu_fnc__LD_B_L, //0x45
-			&GBX::cpu_fnc__LD_B_addrHL, //0x46
-			&GBX::cpu_fnc__LD_B_A, //0x47
-			&GBX::cpu_fnc__LD_C_B, //0x48
-			&GBX::cpu_fnc__LD_C_C, //0x49
-			&GBX::cpu_fnc__LD_C_D, //0x4a
-			&GBX::cpu_fnc__LD_C_E, //0x4b
-			&GBX::cpu_fnc__LD_C_H, //0x4c
-			&GBX::cpu_fnc__LD_C_L, //0x4d
-			&GBX::cpu_fnc__LD_C_addrHL, //0x4e
-			&GBX::cpu_fnc__LD_C_A, //0x4f
-			&GBX::cpu_fnc__LD_D_B, //0x50
-			&GBX::cpu_fnc__LD_D_C, //0x51
-			&GBX::cpu_fnc__LD_D_D, //0x52
-			&GBX::cpu_fnc__LD_D_E, //0x53
-			&GBX::cpu_fnc__LD_D_H, //0x54
-			&GBX::cpu_fnc__LD_D_L, //0x55
-			&GBX::cpu_fnc__LD_D_addrHL, //0x56
-			&GBX::cpu_fnc__LD_D_A, //0x57
-			&GBX::cpu_fnc__LD_E_B, //0x58
-			&GBX::cpu_fnc__LD_E_C, //0x59
-			&GBX::cpu_fnc__LD_E_D, //0x5a
-			&GBX::cpu_fnc__LD_E_E, //0x5b
-			&GBX::cpu_fnc__LD_E_H, //0x5c
-			&GBX::cpu_fnc__LD_E_L, //0x5d
-			&GBX::cpu_fnc__LD_E_addrHL, //0x5e
-			&GBX::cpu_fnc__LD_E_A, //0x5f
-			&GBX::cpu_fnc__LD_H_B, //0x60
-			&GBX::cpu_fnc__LD_H_C, //0x61
-			&GBX::cpu_fnc__LD_H_D, //0x62
-			&GBX::cpu_fnc__LD_H_E, //0x63
-			&GBX::cpu_fnc__LD_H_H, //0x64
-			&GBX::cpu_fnc__LD_H_L, //0x65
-			&GBX::cpu_fnc__LD_H_addrHL, //0x66
-			&GBX::cpu_fnc__LD_H_A, //0x67
-			&GBX::cpu_fnc__LD_L_B, //0x68
-			&GBX::cpu_fnc__LD_L_C, //0x69
-			&GBX::cpu_fnc__LD_L_D, //0x6a
-			&GBX::cpu_fnc__LD_L_E, //0x6b
-			&GBX::cpu_fnc__LD_L_H, //0x6c
-			&GBX::cpu_fnc__LD_L_L, //0x6d
-			&GBX::cpu_fnc__LD_L_addrHL, //0x6e
-			&GBX::cpu_fnc__LD_L_A, //0x6f
-			&GBX::cpu_fnc__LD_addrHL_B, //0x70
-			&GBX::cpu_fnc__LD_addrHL_C, //0x71
-			&GBX::cpu_fnc__LD_addrHL_D, //0x72
-			&GBX::cpu_fnc__LD_addrHL_E, //0x73
-			&GBX::cpu_fnc__LD_addrHL_H, //0x74
-			&GBX::cpu_fnc__LD_addrHL_L, //0x75
-			&GBX::cpu_fnc__HALT, //0x76
-			&GBX::cpu_fnc__LD_addrHL_A, //0x77
-			&GBX::cpu_fnc__LD_A_B, //0x78
-			&GBX::cpu_fnc__LD_A_C, //0x79
-			&GBX::cpu_fnc__LD_A_D, //0x7a
-			&GBX::cpu_fnc__LD_A_E, //0x7b
-			&GBX::cpu_fnc__LD_A_H, //0x7c
-			&GBX::cpu_fnc__LD_A_L, //0x7d
-			&GBX::cpu_fnc__LD_A_addrHL, //0x7e
-			&GBX::cpu_fnc__LD_A_A, //0x7f
-			&GBX::cpu_fnc__ADD_A_B, //0x80
-			&GBX::cpu_fnc__ADD_A_C, //0x81
-			&GBX::cpu_fnc__ADD_A_D, //0x82
-			&GBX::cpu_fnc__ADD_A_E, //0x83
-			&GBX::cpu_fnc__ADD_A_H, //0x84
-			&GBX::cpu_fnc__ADD_A_L, //0x85
-			&GBX::cpu_fnc__ADD_A_addrHL, //0x86
-			&GBX::cpu_fnc__ADD_A_A, //0x87
-			&GBX::cpu_fnc__ADC_A_B, //0x88
-			&GBX::cpu_fnc__ADC_A_C, //0x89
-			&GBX::cpu_fnc__ADC_A_D, //0x8a
-			&GBX::cpu_fnc__ADC_A_E, //0x8b
-			&GBX::cpu_fnc__ADC_A_H, //0x8c
-			&GBX::cpu_fnc__ADC_A_L, //0x8d
-			&GBX::cpu_fnc__ADC_A_addrHL, //0x8e
-			&GBX::cpu_fnc__ADC_A_A, //0x8f
-			&GBX::cpu_fnc__SUB_A_B, //0x90
-			&GBX::cpu_fnc__SUB_A_C, //0x91
-			&GBX::cpu_fnc__SUB_A_D, //0x92
-			&GBX::cpu_fnc__SUB_A_E, //0x93
-			&GBX::cpu_fnc__SUB_A_H, //0x94
-			&GBX::cpu_fnc__SUB_A_L, //0x95
-			&GBX::cpu_fnc__SUB_A_addrHL, //0x96
-			&GBX::cpu_fnc__SUB_A_A, //0x97
-			&GBX::cpu_fnc__SBC_A_B, //0x98
-			&GBX::cpu_fnc__SBC_A_C, //0x99
-			&GBX::cpu_fnc__SBC_A_D, //0x9a
-			&GBX::cpu_fnc__SBC_A_E, //0x9b
-			&GBX::cpu_fnc__SBC_A_H, //0x9c
-			&GBX::cpu_fnc__SBC_A_L, //0x9d
-			&GBX::cpu_fnc__SBC_A_addrHL, //0x9e
-			&GBX::cpu_fnc__SBC_A_A, //0x9f
-			&GBX::cpu_fnc__AND_A_B, //0xa0
-			&GBX::cpu_fnc__AND_A_C, //0xa1
-			&GBX::cpu_fnc__AND_A_D, //0xa2
-			&GBX::cpu_fnc__AND_A_E, //0xa3
-			&GBX::cpu_fnc__AND_A_H, //0xa4
-			&GBX::cpu_fnc__AND_A_L, //0xa5
-			&GBX::cpu_fnc__AND_A_addrHL, //0xa6
-			&GBX::cpu_fnc__AND_A_A, //0xa7
-			&GBX::cpu_fnc__XOR_A_B, //0xa8
-			&GBX::cpu_fnc__XOR_A_C, //0xa9
-			&GBX::cpu_fnc__XOR_A_D, //0xaa
-			&GBX::cpu_fnc__XOR_A_E, //0xab
-			&GBX::cpu_fnc__XOR_A_H, //0xac
-			&GBX::cpu_fnc__XOR_A_L, //0xad
-			&GBX::cpu_fnc__XOR_A_addrHL, //0xae
-			&GBX::cpu_fnc__XOR_A_A, //0xaf
-			&GBX::cpu_fnc__OR_A_B, //0xb0
-			&GBX::cpu_fnc__OR_A_C, //0xb1
-			&GBX::cpu_fnc__OR_A_D, //0xb2
-			&GBX::cpu_fnc__OR_A_E, //0xb3
-			&GBX::cpu_fnc__OR_A_H, //0xb4
-			&GBX::cpu_fnc__OR_A_L, //0xb5
-			&GBX::cpu_fnc__OR_A_addrHL, //0xb6
-			&GBX::cpu_fnc__OR_A_A, //0xb7
-			&GBX::cpu_fnc__CP_A_B, //0xb8
-			&GBX::cpu_fnc__CP_A_C, //0xb9
-			&GBX::cpu_fnc__CP_A_D, //0xba
-			&GBX::cpu_fnc__CP_A_E, //0xbb
-			&GBX::cpu_fnc__CP_A_H, //0xbc
-			&GBX::cpu_fnc__CP_A_L, //0xbd
-			&GBX::cpu_fnc__CP_A_addrHL, //0xbe
-			&GBX::cpu_fnc__CP_A_A, //0xbf
-			&GBX::cpu_fnc__RET_FNZ, //0xc0
-			&GBX::cpu_fnc__POP_BC, //0xc1
-			&GBX::cpu_fnc__JP_FNZ_n16, //0xc2
-			&GBX::cpu_fnc__JP_n16, //0xc3
-			&GBX::cpu_fnc__CALL_FNZ_n16, //0xc4
-			&GBX::cpu_fnc__PUSH_BC, //0xc5
-			&GBX::cpu_fnc__ADD_A_n8, //0xc6
-			&GBX::cpu_fnc__RST_00h, //0xc7
-			&GBX::cpu_fnc__RET_FZ, //0xc8
-			&GBX::cpu_fnc__RET, //0xc9
-			&GBX::cpu_fnc__JP_FZ_n16, //0xca
-			&GBX::cpu_fnc__PREFIX, //0xcb
-			&GBX::cpu_fnc__CALL_FZ_n16, //0xcc
-			&GBX::cpu_fnc__CALL_n16, //0xcd
-			&GBX::cpu_fnc__ADC_A_n8, //0xce
-			&GBX::cpu_fnc__RST_08h, //0xcf
-			&GBX::cpu_fnc__RET_FNC, //0xd0
-			&GBX::cpu_fnc__POP_DE, //0xd1
-			&GBX::cpu_fnc__JP_FNC_n16, //0xd2
-			&GBX::cpu_fnc__GARBAGE, //0xd3
-			&GBX::cpu_fnc__CALL_FNC_n16, //0xd4
-			&GBX::cpu_fnc__PUSH_DE, //0xd5
-			&GBX::cpu_fnc__SUB_A_n8, //0xd6
-			&GBX::cpu_fnc__RST_10h, //0xd7
-			&GBX::cpu_fnc__RET_FC, //0xd8
-			&GBX::cpu_fnc__RETI, //0xd9
-			&GBX::cpu_fnc__JP_FC_n16, //0xda
-			&GBX::cpu_fnc__GARBAGE, //0xdb
-			&GBX::cpu_fnc__CALL_FC_n16, //0xdc
-			&GBX::cpu_fnc__GARBAGE, //0xdd
-			&GBX::cpu_fnc__SBC_A_n8, //0xde
-			&GBX::cpu_fnc__RST_18h, //0xdf
-			&GBX::cpu_fnc__LDH_addrn16_A, //0xe0
-			&GBX::cpu_fnc__POP_HL, //0xe1
-			&GBX::cpu_fnc__LDH_addrC_A, //0xe2
-			&GBX::cpu_fnc__GARBAGE, //0xe3
-			&GBX::cpu_fnc__GARBAGE, //0xe4
-			&GBX::cpu_fnc__PUSH_HL, //0xe5
-			&GBX::cpu_fnc__AND_A_n8, //0xe6
-			&GBX::cpu_fnc__RST_20h, //0xe7
-			&GBX::cpu_fnc__ADD_SP_e8, //0xe8
-			&GBX::cpu_fnc__JP_HL, //0xe9
-			&GBX::cpu_fnc__LD_addrn16_A, //0xea
-			&GBX::cpu_fnc__GARBAGE, //0xeb
-			&GBX::cpu_fnc__GARBAGE, //0xec
-			&GBX::cpu_fnc__GARBAGE, //0xed
-			&GBX::cpu_fnc__XOR_A_n8, //0xee
-			&GBX::cpu_fnc__RST_28h, //0xef
-			&GBX::cpu_fnc__LDH_A_addrn16, //0xf0
-			&GBX::cpu_fnc__POP_AF, //0xf1
-			&GBX::cpu_fnc__LDH_A_addrC, //0xf2
-			&GBX::cpu_fnc__DI, //0xf3
-			&GBX::cpu_fnc__GARBAGE, //0xf4
-			&GBX::cpu_fnc__PUSH_AF, //0xf5
-			&GBX::cpu_fnc__OR_A_n8, //0xf6
-			&GBX::cpu_fnc__RST_30h, //0xf7
-			&GBX::cpu_fnc__LD_HL_SPpe8, //0xf8
-			&GBX::cpu_fnc__LD_SP_HL, //0xf9
-			&GBX::cpu_fnc__LD_A_addrn16, //0xfa
-			&GBX::cpu_fnc__EI, //0xfb
-			&GBX::cpu_fnc__GARBAGE, //0xfc
-			&GBX::cpu_fnc__GARBAGE, //0xfd
-			&GBX::cpu_fnc__CP_A_n8, //0xfe
-			&GBX::cpu_fnc__RST_38h, //0xff
+	void (GameBoy::*cpu_instruction_table[INSTRUCTION_NUM])() = {
+			&GameBoy::cpu_fnc__NOP, //0x00
+			&GameBoy::cpu_fnc__LD_BC_n16, //0x01
+			&GameBoy::cpu_fnc__LD_addrBC_A, //0x02
+			&GameBoy::cpu_fnc__INC_BC, //0x03
+			&GameBoy::cpu_fnc__INC_B, //0x04
+			&GameBoy::cpu_fnc__DEC_B, //0x05
+			&GameBoy::cpu_fnc__LD_B_n8, //0x06
+			&GameBoy::cpu_fnc__RLCA, //0x07
+			&GameBoy::cpu_fnc__LD_addrn16_SP, //0x08
+			&GameBoy::cpu_fnc__ADD_HL_BC, //0x09
+			&GameBoy::cpu_fnc__LD_A_addrBC, //0x0a
+			&GameBoy::cpu_fnc__DEC_BC, //0x0b
+			&GameBoy::cpu_fnc__INC_C, //0x0c
+			&GameBoy::cpu_fnc__DEC_C, //0x0d
+			&GameBoy::cpu_fnc__LD_C_n8, //0x0e
+			&GameBoy::cpu_fnc__RRCA, //0x0f
+			&GameBoy::cpu_fnc__STOP, //0x10
+			&GameBoy::cpu_fnc__LD_DE_n16, //0x11
+			&GameBoy::cpu_fnc__LD_addrDE_A, //0x12
+			&GameBoy::cpu_fnc__INC_DE, //0x13
+			&GameBoy::cpu_fnc__INC_D, //0x14
+			&GameBoy::cpu_fnc__DEC_D, //0x15
+			&GameBoy::cpu_fnc__LD_D_n8, //0x16
+			&GameBoy::cpu_fnc__RLA, //0x17
+			&GameBoy::cpu_fnc__JR_e8, //0x18
+			&GameBoy::cpu_fnc__ADD_HL_DE, //0x19
+			&GameBoy::cpu_fnc__LD_A_addrDE, //0x1a
+			&GameBoy::cpu_fnc__DEC_DE, //0x1b
+			&GameBoy::cpu_fnc__INC_E, //0x1c
+			&GameBoy::cpu_fnc__DEC_E, //0x1d
+			&GameBoy::cpu_fnc__LD_E_n8, //0x1e
+			&GameBoy::cpu_fnc__RRA, //0x1f
+			&GameBoy::cpu_fnc__JR_FNZ_e8, //0x20
+			&GameBoy::cpu_fnc__LD_HL_n16, //0x21
+			&GameBoy::cpu_fnc__LD_addrHLI_A, //0x22
+			&GameBoy::cpu_fnc__INC_HL, //0x23
+			&GameBoy::cpu_fnc__INC_H, //0x24
+			&GameBoy::cpu_fnc__DEC_H, //0x25
+			&GameBoy::cpu_fnc__LD_H_n8, //0x26
+			&GameBoy::cpu_fnc__DAA, //0x27
+			&GameBoy::cpu_fnc__JR_FZ_e8, //0x28
+			&GameBoy::cpu_fnc__ADD_HL_HL, //0x29
+			&GameBoy::cpu_fnc__LD_A_addrHLI, //0x2a
+			&GameBoy::cpu_fnc__DEC_HL, //0x2b
+			&GameBoy::cpu_fnc__INC_L, //0x2c
+			&GameBoy::cpu_fnc__DEC_L, //0x2d
+			&GameBoy::cpu_fnc__LD_L_n8, //0x2e
+			&GameBoy::cpu_fnc__CPL, //0x2f
+			&GameBoy::cpu_fnc__JR_FNC_e8, //0x30
+			&GameBoy::cpu_fnc__LD_SP_n16, //0x31
+			&GameBoy::cpu_fnc__LD_addrHLD_A, //0x32
+			&GameBoy::cpu_fnc__INC_SP, //0x33
+			&GameBoy::cpu_fnc__INC_addrHL, //0x34
+			&GameBoy::cpu_fnc__DEC_addrHL, //0x35
+			&GameBoy::cpu_fnc__LD_addrHL_n8, //0x36
+			&GameBoy::cpu_fnc__SCF, //0x37
+			&GameBoy::cpu_fnc__JR_FC_e8, //0x38
+			&GameBoy::cpu_fnc__ADD_HL_SP, //0x39
+			&GameBoy::cpu_fnc__LD_A_addrHLD, //0x3a
+			&GameBoy::cpu_fnc__DEC_SP, //0x3b
+			&GameBoy::cpu_fnc__INC_A, //0x3c
+			&GameBoy::cpu_fnc__DEC_A, //0x3d
+			&GameBoy::cpu_fnc__LD_A_n8, //0x3e
+			&GameBoy::cpu_fnc__CCF, //0x3f
+			&GameBoy::cpu_fnc__LD_B_B, //0x40
+			&GameBoy::cpu_fnc__LD_B_C, //0x41
+			&GameBoy::cpu_fnc__LD_B_D, //0x42
+			&GameBoy::cpu_fnc__LD_B_E, //0x43
+			&GameBoy::cpu_fnc__LD_B_H, //0x44
+			&GameBoy::cpu_fnc__LD_B_L, //0x45
+			&GameBoy::cpu_fnc__LD_B_addrHL, //0x46
+			&GameBoy::cpu_fnc__LD_B_A, //0x47
+			&GameBoy::cpu_fnc__LD_C_B, //0x48
+			&GameBoy::cpu_fnc__LD_C_C, //0x49
+			&GameBoy::cpu_fnc__LD_C_D, //0x4a
+			&GameBoy::cpu_fnc__LD_C_E, //0x4b
+			&GameBoy::cpu_fnc__LD_C_H, //0x4c
+			&GameBoy::cpu_fnc__LD_C_L, //0x4d
+			&GameBoy::cpu_fnc__LD_C_addrHL, //0x4e
+			&GameBoy::cpu_fnc__LD_C_A, //0x4f
+			&GameBoy::cpu_fnc__LD_D_B, //0x50
+			&GameBoy::cpu_fnc__LD_D_C, //0x51
+			&GameBoy::cpu_fnc__LD_D_D, //0x52
+			&GameBoy::cpu_fnc__LD_D_E, //0x53
+			&GameBoy::cpu_fnc__LD_D_H, //0x54
+			&GameBoy::cpu_fnc__LD_D_L, //0x55
+			&GameBoy::cpu_fnc__LD_D_addrHL, //0x56
+			&GameBoy::cpu_fnc__LD_D_A, //0x57
+			&GameBoy::cpu_fnc__LD_E_B, //0x58
+			&GameBoy::cpu_fnc__LD_E_C, //0x59
+			&GameBoy::cpu_fnc__LD_E_D, //0x5a
+			&GameBoy::cpu_fnc__LD_E_E, //0x5b
+			&GameBoy::cpu_fnc__LD_E_H, //0x5c
+			&GameBoy::cpu_fnc__LD_E_L, //0x5d
+			&GameBoy::cpu_fnc__LD_E_addrHL, //0x5e
+			&GameBoy::cpu_fnc__LD_E_A, //0x5f
+			&GameBoy::cpu_fnc__LD_H_B, //0x60
+			&GameBoy::cpu_fnc__LD_H_C, //0x61
+			&GameBoy::cpu_fnc__LD_H_D, //0x62
+			&GameBoy::cpu_fnc__LD_H_E, //0x63
+			&GameBoy::cpu_fnc__LD_H_H, //0x64
+			&GameBoy::cpu_fnc__LD_H_L, //0x65
+			&GameBoy::cpu_fnc__LD_H_addrHL, //0x66
+			&GameBoy::cpu_fnc__LD_H_A, //0x67
+			&GameBoy::cpu_fnc__LD_L_B, //0x68
+			&GameBoy::cpu_fnc__LD_L_C, //0x69
+			&GameBoy::cpu_fnc__LD_L_D, //0x6a
+			&GameBoy::cpu_fnc__LD_L_E, //0x6b
+			&GameBoy::cpu_fnc__LD_L_H, //0x6c
+			&GameBoy::cpu_fnc__LD_L_L, //0x6d
+			&GameBoy::cpu_fnc__LD_L_addrHL, //0x6e
+			&GameBoy::cpu_fnc__LD_L_A, //0x6f
+			&GameBoy::cpu_fnc__LD_addrHL_B, //0x70
+			&GameBoy::cpu_fnc__LD_addrHL_C, //0x71
+			&GameBoy::cpu_fnc__LD_addrHL_D, //0x72
+			&GameBoy::cpu_fnc__LD_addrHL_E, //0x73
+			&GameBoy::cpu_fnc__LD_addrHL_H, //0x74
+			&GameBoy::cpu_fnc__LD_addrHL_L, //0x75
+			&GameBoy::cpu_fnc__HALT, //0x76
+			&GameBoy::cpu_fnc__LD_addrHL_A, //0x77
+			&GameBoy::cpu_fnc__LD_A_B, //0x78
+			&GameBoy::cpu_fnc__LD_A_C, //0x79
+			&GameBoy::cpu_fnc__LD_A_D, //0x7a
+			&GameBoy::cpu_fnc__LD_A_E, //0x7b
+			&GameBoy::cpu_fnc__LD_A_H, //0x7c
+			&GameBoy::cpu_fnc__LD_A_L, //0x7d
+			&GameBoy::cpu_fnc__LD_A_addrHL, //0x7e
+			&GameBoy::cpu_fnc__LD_A_A, //0x7f
+			&GameBoy::cpu_fnc__ADD_A_B, //0x80
+			&GameBoy::cpu_fnc__ADD_A_C, //0x81
+			&GameBoy::cpu_fnc__ADD_A_D, //0x82
+			&GameBoy::cpu_fnc__ADD_A_E, //0x83
+			&GameBoy::cpu_fnc__ADD_A_H, //0x84
+			&GameBoy::cpu_fnc__ADD_A_L, //0x85
+			&GameBoy::cpu_fnc__ADD_A_addrHL, //0x86
+			&GameBoy::cpu_fnc__ADD_A_A, //0x87
+			&GameBoy::cpu_fnc__ADC_A_B, //0x88
+			&GameBoy::cpu_fnc__ADC_A_C, //0x89
+			&GameBoy::cpu_fnc__ADC_A_D, //0x8a
+			&GameBoy::cpu_fnc__ADC_A_E, //0x8b
+			&GameBoy::cpu_fnc__ADC_A_H, //0x8c
+			&GameBoy::cpu_fnc__ADC_A_L, //0x8d
+			&GameBoy::cpu_fnc__ADC_A_addrHL, //0x8e
+			&GameBoy::cpu_fnc__ADC_A_A, //0x8f
+			&GameBoy::cpu_fnc__SUB_A_B, //0x90
+			&GameBoy::cpu_fnc__SUB_A_C, //0x91
+			&GameBoy::cpu_fnc__SUB_A_D, //0x92
+			&GameBoy::cpu_fnc__SUB_A_E, //0x93
+			&GameBoy::cpu_fnc__SUB_A_H, //0x94
+			&GameBoy::cpu_fnc__SUB_A_L, //0x95
+			&GameBoy::cpu_fnc__SUB_A_addrHL, //0x96
+			&GameBoy::cpu_fnc__SUB_A_A, //0x97
+			&GameBoy::cpu_fnc__SBC_A_B, //0x98
+			&GameBoy::cpu_fnc__SBC_A_C, //0x99
+			&GameBoy::cpu_fnc__SBC_A_D, //0x9a
+			&GameBoy::cpu_fnc__SBC_A_E, //0x9b
+			&GameBoy::cpu_fnc__SBC_A_H, //0x9c
+			&GameBoy::cpu_fnc__SBC_A_L, //0x9d
+			&GameBoy::cpu_fnc__SBC_A_addrHL, //0x9e
+			&GameBoy::cpu_fnc__SBC_A_A, //0x9f
+			&GameBoy::cpu_fnc__AND_A_B, //0xa0
+			&GameBoy::cpu_fnc__AND_A_C, //0xa1
+			&GameBoy::cpu_fnc__AND_A_D, //0xa2
+			&GameBoy::cpu_fnc__AND_A_E, //0xa3
+			&GameBoy::cpu_fnc__AND_A_H, //0xa4
+			&GameBoy::cpu_fnc__AND_A_L, //0xa5
+			&GameBoy::cpu_fnc__AND_A_addrHL, //0xa6
+			&GameBoy::cpu_fnc__AND_A_A, //0xa7
+			&GameBoy::cpu_fnc__XOR_A_B, //0xa8
+			&GameBoy::cpu_fnc__XOR_A_C, //0xa9
+			&GameBoy::cpu_fnc__XOR_A_D, //0xaa
+			&GameBoy::cpu_fnc__XOR_A_E, //0xab
+			&GameBoy::cpu_fnc__XOR_A_H, //0xac
+			&GameBoy::cpu_fnc__XOR_A_L, //0xad
+			&GameBoy::cpu_fnc__XOR_A_addrHL, //0xae
+			&GameBoy::cpu_fnc__XOR_A_A, //0xaf
+			&GameBoy::cpu_fnc__OR_A_B, //0xb0
+			&GameBoy::cpu_fnc__OR_A_C, //0xb1
+			&GameBoy::cpu_fnc__OR_A_D, //0xb2
+			&GameBoy::cpu_fnc__OR_A_E, //0xb3
+			&GameBoy::cpu_fnc__OR_A_H, //0xb4
+			&GameBoy::cpu_fnc__OR_A_L, //0xb5
+			&GameBoy::cpu_fnc__OR_A_addrHL, //0xb6
+			&GameBoy::cpu_fnc__OR_A_A, //0xb7
+			&GameBoy::cpu_fnc__CP_A_B, //0xb8
+			&GameBoy::cpu_fnc__CP_A_C, //0xb9
+			&GameBoy::cpu_fnc__CP_A_D, //0xba
+			&GameBoy::cpu_fnc__CP_A_E, //0xbb
+			&GameBoy::cpu_fnc__CP_A_H, //0xbc
+			&GameBoy::cpu_fnc__CP_A_L, //0xbd
+			&GameBoy::cpu_fnc__CP_A_addrHL, //0xbe
+			&GameBoy::cpu_fnc__CP_A_A, //0xbf
+			&GameBoy::cpu_fnc__RET_FNZ, //0xc0
+			&GameBoy::cpu_fnc__POP_BC, //0xc1
+			&GameBoy::cpu_fnc__JP_FNZ_n16, //0xc2
+			&GameBoy::cpu_fnc__JP_n16, //0xc3
+			&GameBoy::cpu_fnc__CALL_FNZ_n16, //0xc4
+			&GameBoy::cpu_fnc__PUSH_BC, //0xc5
+			&GameBoy::cpu_fnc__ADD_A_n8, //0xc6
+			&GameBoy::cpu_fnc__RST_00h, //0xc7
+			&GameBoy::cpu_fnc__RET_FZ, //0xc8
+			&GameBoy::cpu_fnc__RET, //0xc9
+			&GameBoy::cpu_fnc__JP_FZ_n16, //0xca
+			&GameBoy::cpu_fnc__PREFIX, //0xcb
+			&GameBoy::cpu_fnc__CALL_FZ_n16, //0xcc
+			&GameBoy::cpu_fnc__CALL_n16, //0xcd
+			&GameBoy::cpu_fnc__ADC_A_n8, //0xce
+			&GameBoy::cpu_fnc__RST_08h, //0xcf
+			&GameBoy::cpu_fnc__RET_FNC, //0xd0
+			&GameBoy::cpu_fnc__POP_DE, //0xd1
+			&GameBoy::cpu_fnc__JP_FNC_n16, //0xd2
+			&GameBoy::cpu_fnc__GARBAGE, //0xd3
+			&GameBoy::cpu_fnc__CALL_FNC_n16, //0xd4
+			&GameBoy::cpu_fnc__PUSH_DE, //0xd5
+			&GameBoy::cpu_fnc__SUB_A_n8, //0xd6
+			&GameBoy::cpu_fnc__RST_10h, //0xd7
+			&GameBoy::cpu_fnc__RET_FC, //0xd8
+			&GameBoy::cpu_fnc__RETI, //0xd9
+			&GameBoy::cpu_fnc__JP_FC_n16, //0xda
+			&GameBoy::cpu_fnc__GARBAGE, //0xdb
+			&GameBoy::cpu_fnc__CALL_FC_n16, //0xdc
+			&GameBoy::cpu_fnc__GARBAGE, //0xdd
+			&GameBoy::cpu_fnc__SBC_A_n8, //0xde
+			&GameBoy::cpu_fnc__RST_18h, //0xdf
+			&GameBoy::cpu_fnc__LDH_addrn16_A, //0xe0
+			&GameBoy::cpu_fnc__POP_HL, //0xe1
+			&GameBoy::cpu_fnc__LDH_addrC_A, //0xe2
+			&GameBoy::cpu_fnc__GARBAGE, //0xe3
+			&GameBoy::cpu_fnc__GARBAGE, //0xe4
+			&GameBoy::cpu_fnc__PUSH_HL, //0xe5
+			&GameBoy::cpu_fnc__AND_A_n8, //0xe6
+			&GameBoy::cpu_fnc__RST_20h, //0xe7
+			&GameBoy::cpu_fnc__ADD_SP_e8, //0xe8
+			&GameBoy::cpu_fnc__JP_HL, //0xe9
+			&GameBoy::cpu_fnc__LD_addrn16_A, //0xea
+			&GameBoy::cpu_fnc__GARBAGE, //0xeb
+			&GameBoy::cpu_fnc__GARBAGE, //0xec
+			&GameBoy::cpu_fnc__GARBAGE, //0xed
+			&GameBoy::cpu_fnc__XOR_A_n8, //0xee
+			&GameBoy::cpu_fnc__RST_28h, //0xef
+			&GameBoy::cpu_fnc__LDH_A_addrn16, //0xf0
+			&GameBoy::cpu_fnc__POP_AF, //0xf1
+			&GameBoy::cpu_fnc__LDH_A_addrC, //0xf2
+			&GameBoy::cpu_fnc__DI, //0xf3
+			&GameBoy::cpu_fnc__GARBAGE, //0xf4
+			&GameBoy::cpu_fnc__PUSH_AF, //0xf5
+			&GameBoy::cpu_fnc__OR_A_n8, //0xf6
+			&GameBoy::cpu_fnc__RST_30h, //0xf7
+			&GameBoy::cpu_fnc__LD_HL_SPpe8, //0xf8
+			&GameBoy::cpu_fnc__LD_SP_HL, //0xf9
+			&GameBoy::cpu_fnc__LD_A_addrn16, //0xfa
+			&GameBoy::cpu_fnc__EI, //0xfb
+			&GameBoy::cpu_fnc__GARBAGE, //0xfc
+			&GameBoy::cpu_fnc__GARBAGE, //0xfd
+			&GameBoy::cpu_fnc__CP_A_n8, //0xfe
+			&GameBoy::cpu_fnc__RST_38h, //0xff
 	};
 
 	bool get_timer_enable_flag() {
@@ -4134,6 +4134,7 @@ private:
 	}
 
 	void PREFIX_process(uint8_t instruction_code) {
+		//target_op_ptrがnullptrなら(HL)
 		uint8_t* target_op_ptr = get_target_op_ptr(instruction_code); //操作する"レジスタかメモリ"のポインタ
 
 		if (0x07 >= instruction_code) {//RLC
@@ -4269,7 +4270,9 @@ private:
 			return &(gbx_register.L);
 		}
 		else if (op_index == 6) {
-			return &(gbx_ram.RAM[gbx_register.HL]);
+			//return &(gbx_ram.RAM[gbx_register.HL]);
+			//return get_read_RAM_address___(gbx_register.HL);
+			return nullptr;
 		}
 		//else if (op_index == 7) {
 		else {
@@ -4279,146 +4282,313 @@ private:
 
 
 	void PREFIX_process__RLC(uint8_t* target_op_ptr) {
-		if (((*target_op_ptr) & 0b10000000) != 0) {
-			gbx_register.F_C = 1;
+		if (target_op_ptr != nullptr) {
+			if (((*target_op_ptr) & 0b10000000) != 0) {
+				gbx_register.F_C = 1;
+			}
+			else {
+				gbx_register.F_C = 0;
+			}
+
+			(*target_op_ptr) <<= 1;
+			(*target_op_ptr) |= gbx_register.F_C;
+
+			calc_Z_Flag__8bit(*target_op_ptr);
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 0;
 		}
 		else {
-			gbx_register.F_C = 0;
+			if ((read_RAM_8bit(gbx_register.HL) & 0b10000000) != 0) {
+				gbx_register.F_C = 1;
+			}
+			else {
+				gbx_register.F_C = 0;
+			}
+
+			//(*target_op_ptr) <<= 1;
+			//(*target_op_ptr) |= gbx_register.F_C;
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) << 1);
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) | gbx_register.F_C);
+
+			calc_Z_Flag__8bit(read_RAM_8bit(gbx_register.HL));
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 0;
 		}
-
-		(*target_op_ptr) <<= 1;
-		(*target_op_ptr) |= gbx_register.F_C;
-
-		calc_Z_Flag__8bit(*target_op_ptr);
-		gbx_register.F_N = 0;
-		gbx_register.F_H = 0;
 	}
 
 	void PREFIX_process__RRC(uint8_t* target_op_ptr) {
-		if (((*target_op_ptr) & 0b00000001) != 0) {
-			gbx_register.F_C = 1;
+		if (target_op_ptr != nullptr) {
+			if (((*target_op_ptr) & 0b00000001) != 0) {
+				gbx_register.F_C = 1;
+			}
+			else {
+				gbx_register.F_C = 0;
+			}
+
+			(*target_op_ptr) >>= 1;
+			(*target_op_ptr) |= (gbx_register.F_C << 7);
+
+			calc_Z_Flag__8bit(*target_op_ptr);
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 0;
 		}
 		else {
-			gbx_register.F_C = 0;
+			if ((read_RAM_8bit(gbx_register.HL) & 0b00000001) != 0) {
+				gbx_register.F_C = 1;
+			}
+			else {
+				gbx_register.F_C = 0;
+			}
+
+			//(*target_op_ptr) >>= 1;
+			//(*target_op_ptr) |= (gbx_register.F_C << 7);
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) >> 1);
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) | (gbx_register.F_C << 7));
+
+			calc_Z_Flag__8bit(read_RAM_8bit(gbx_register.HL));
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 0;
 		}
-
-		(*target_op_ptr) >>= 1;
-		(*target_op_ptr) |= (gbx_register.F_C << 7);
-
-		calc_Z_Flag__8bit(*target_op_ptr);
-		gbx_register.F_N = 0;
-		gbx_register.F_H = 0;
 	}
 
 	void PREFIX_process__RL(uint8_t* target_op_ptr) {
-		uint8_t bef_C_Flag = gbx_register.F_C;
+		if (target_op_ptr != nullptr) {
+			uint8_t bef_C_Flag = gbx_register.F_C;
 
-		if (((*target_op_ptr) & 0b10000000) != 0) {
-			gbx_register.F_C = 1;
+			if (((*target_op_ptr) & 0b10000000) != 0) {
+				gbx_register.F_C = 1;
+			}
+			else {
+				gbx_register.F_C = 0;
+			}
+
+			(*target_op_ptr) <<= 1;
+			(*target_op_ptr) |= bef_C_Flag;
+
+			calc_Z_Flag__8bit(*target_op_ptr);
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 0;
 		}
 		else {
-			gbx_register.F_C = 0;
+			uint8_t bef_C_Flag = gbx_register.F_C;
+
+			if ((read_RAM_8bit(gbx_register.HL) & 0b10000000) != 0) {
+				gbx_register.F_C = 1;
+			}
+			else {
+				gbx_register.F_C = 0;
+			}
+
+			//(*target_op_ptr) <<= 1;
+			//(*target_op_ptr) |= bef_C_Flag;
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) << 1);
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) | bef_C_Flag);
+
+			calc_Z_Flag__8bit(read_RAM_8bit(gbx_register.HL));
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 0;
 		}
-
-		(*target_op_ptr) <<= 1;
-		(*target_op_ptr) |= bef_C_Flag;
-
-		calc_Z_Flag__8bit(*target_op_ptr);
-		gbx_register.F_N = 0;
-		gbx_register.F_H = 0;
 	}
 
 	void PREFIX_process__RR(uint8_t* target_op_ptr) {
-		uint8_t bef_C_Flag = gbx_register.F_C;
+		if (target_op_ptr != nullptr) {
+			uint8_t bef_C_Flag = gbx_register.F_C;
 
-		if (((*target_op_ptr) & 0b00000001) != 0) {
-			gbx_register.F_C = 1;
+			if (((*target_op_ptr) & 0b00000001) != 0) {
+				gbx_register.F_C = 1;
+			}
+			else {
+				gbx_register.F_C = 0;
+			}
+
+			(*target_op_ptr) >>= 1;
+			(*target_op_ptr) |= (bef_C_Flag << 7);
+
+			calc_Z_Flag__8bit(*target_op_ptr);
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 0;
 		}
 		else {
-			gbx_register.F_C = 0;
+			uint8_t bef_C_Flag = gbx_register.F_C;
+
+			if ((read_RAM_8bit(gbx_register.HL) & 0b00000001) != 0) {
+				gbx_register.F_C = 1;
+			}
+			else {
+				gbx_register.F_C = 0;
+			}
+
+			//(*target_op_ptr) >>= 1;
+			//(*target_op_ptr) |= (bef_C_Flag << 7);
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) >> 1);
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) | (bef_C_Flag << 7));
+
+			calc_Z_Flag__8bit(read_RAM_8bit(gbx_register.HL));
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 0;
 		}
-
-		(*target_op_ptr) >>= 1;
-		(*target_op_ptr) |= (bef_C_Flag << 7);
-
-		calc_Z_Flag__8bit(*target_op_ptr);
-		gbx_register.F_N = 0;
-		gbx_register.F_H = 0;
 	}
 
 	void PREFIX_process__SLA(uint8_t* target_op_ptr) {
-		if (((*target_op_ptr) & 0b10000000) != 0) {
-			gbx_register.F_C = 1;
+		if (target_op_ptr != nullptr) {
+			if (((*target_op_ptr) & 0b10000000) != 0) {
+				gbx_register.F_C = 1;
+			}
+			else {
+				gbx_register.F_C = 0;
+			}
+
+			(*target_op_ptr) <<= 1;
+
+			calc_Z_Flag__8bit(*target_op_ptr);
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 0;
 		}
 		else {
-			gbx_register.F_C = 0;
+			if ((read_RAM_8bit(gbx_register.HL) & 0b10000000) != 0) {
+				gbx_register.F_C = 1;
+			}
+			else {
+				gbx_register.F_C = 0;
+			}
+
+			//(*target_op_ptr) <<= 1;
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) << 1);
+
+			calc_Z_Flag__8bit(read_RAM_8bit(gbx_register.HL));
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 0;
 		}
-
-		(*target_op_ptr) <<= 1;
-
-		calc_Z_Flag__8bit(*target_op_ptr);
-		gbx_register.F_N = 0;
-		gbx_register.F_H = 0;
 	}
 
 	void PREFIX_process__SRA(uint8_t* target_op_ptr) {
-		uint8_t bef_sign = (((*target_op_ptr) & 0b10000000) != 0) ? 1 : 0;
+		if (target_op_ptr != nullptr) {
+			uint8_t bef_sign = (((*target_op_ptr) & 0b10000000) != 0) ? 1 : 0;
 
-		if (((*target_op_ptr) & 0b00000001) != 0) {
-			gbx_register.F_C = 1;
+			if (((*target_op_ptr) & 0b00000001) != 0) {
+				gbx_register.F_C = 1;
+			}
+			else {
+				gbx_register.F_C = 0;
+			}
+
+			(*target_op_ptr) >>= 1;
+			(*target_op_ptr) &= 0b01111111;
+			(*target_op_ptr) |= (bef_sign << 7);
+
+			calc_Z_Flag__8bit(*target_op_ptr);
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 0;
 		}
 		else {
-			gbx_register.F_C = 0;
+			uint8_t bef_sign = ((read_RAM_8bit(gbx_register.HL) & 0b10000000) != 0) ? 1 : 0;
+
+			if ((read_RAM_8bit(gbx_register.HL) & 0b00000001) != 0) {
+				gbx_register.F_C = 1;
+			}
+			else {
+				gbx_register.F_C = 0;
+			}
+
+			//(*target_op_ptr) >>= 1;
+			//(*target_op_ptr) &= 0b01111111;
+			//(*target_op_ptr) |= (bef_sign << 7);
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) >> 1);
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) & 0b01111111);
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) | (bef_sign << 7));
+
+			calc_Z_Flag__8bit(read_RAM_8bit(gbx_register.HL));
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 0;
 		}
-
-		(*target_op_ptr) >>= 1;
-		(*target_op_ptr) &= 0b01111111;
-		(*target_op_ptr) |= (bef_sign << 7);
-
-		calc_Z_Flag__8bit(*target_op_ptr);
-		gbx_register.F_N = 0;
-		gbx_register.F_H = 0;
 	}
 
 	void PREFIX_process__SWAP(uint8_t* target_op_ptr) {
-		uint8_t bef_value = (*target_op_ptr);
+		if (target_op_ptr != nullptr) {
+			uint8_t bef_value = (*target_op_ptr);
 
-		(*target_op_ptr) >>= 4;
-		(*target_op_ptr) &= 0b00001111;
-		(*target_op_ptr) |= ((bef_value << 4) & 0b11110000);
+			(*target_op_ptr) >>= 4;
+			(*target_op_ptr) &= 0b00001111;
+			(*target_op_ptr) |= ((bef_value << 4) & 0b11110000);
 
-		calc_Z_Flag__8bit(*target_op_ptr);
-		gbx_register.F_C = 0;
-		gbx_register.F_H = 0;
-		gbx_register.F_N = 0;
+			calc_Z_Flag__8bit(*target_op_ptr);
+			gbx_register.F_C = 0;
+			gbx_register.F_H = 0;
+			gbx_register.F_N = 0;
+		}
+		else {
+			uint8_t bef_value = read_RAM_8bit(gbx_register.HL);
+
+			//(*target_op_ptr) >>= 4;
+			//(*target_op_ptr) &= 0b00001111;
+			//(*target_op_ptr) |= ((bef_value << 4) & 0b11110000);
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) >> 4);
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) & 0b00001111);
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) | ((bef_value << 4) & 0b11110000));
+
+			calc_Z_Flag__8bit(read_RAM_8bit(gbx_register.HL));
+			gbx_register.F_C = 0;
+			gbx_register.F_H = 0;
+			gbx_register.F_N = 0;
+		}
 	}
 
 	void PREFIX_process__SRL(uint8_t* target_op_ptr) {
-		if (((*target_op_ptr) & 0b00000001) != 0) {
-			gbx_register.F_C = 1;
+		if (target_op_ptr != nullptr) {
+			if (((*target_op_ptr) & 0b00000001) != 0) {
+				gbx_register.F_C = 1;
+			}
+			else {
+				gbx_register.F_C = 0;
+			}
+
+			(*target_op_ptr) >>= 1;
+
+			calc_Z_Flag__8bit(*target_op_ptr);
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 0;
 		}
 		else {
-			gbx_register.F_C = 0;
+			if ((read_RAM_8bit(gbx_register.HL) & 0b00000001) != 0) {
+				gbx_register.F_C = 1;
+			}
+			else {
+				gbx_register.F_C = 0;
+			}
+
+			//(*target_op_ptr) >>= 1;
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) >> 1);
+
+			calc_Z_Flag__8bit(read_RAM_8bit(gbx_register.HL));
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 0;
 		}
-
-		(*target_op_ptr) >>= 1;
-
-		calc_Z_Flag__8bit(*target_op_ptr);
-		gbx_register.F_N = 0;
-		gbx_register.F_H = 0;
 	}
 
 
 	void PREFIX_sub_process__BIT(uint8_t check_bit, uint8_t* target_op_ptr) {
-		if (((*target_op_ptr) & (0b00000001 << check_bit)) == 0) {
-			gbx_register.F_Z = 1;
+		if (target_op_ptr != nullptr) {
+			if (((*target_op_ptr) & (0b00000001 << check_bit)) == 0) {
+				gbx_register.F_Z = 1;
+			}
+			else {
+				gbx_register.F_Z = 0;
+			}
+
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 1;
 		}
 		else {
-			gbx_register.F_Z = 0;
-		}
+			if ((read_RAM_8bit(gbx_register.HL) & (0b00000001 << check_bit)) == 0) {
+				gbx_register.F_Z = 1;
+			}
+			else {
+				gbx_register.F_Z = 0;
+			}
 
-		gbx_register.F_N = 0;
-		gbx_register.F_H = 1;
+			gbx_register.F_N = 0;
+			gbx_register.F_H = 1;
+		}
 	}
 	void PREFIX_process__BIT_0(uint8_t* target_op_ptr) {
 		PREFIX_sub_process__BIT(0, target_op_ptr);
@@ -4446,7 +4616,13 @@ private:
 	}
 
 	void PREFIX_sub_process__RES(uint8_t clear_bit, uint8_t* target_op_ptr) {
-		(*target_op_ptr) &= (uint8_t)(~(0b00000001 << clear_bit));
+		if (target_op_ptr != nullptr) {
+			(*target_op_ptr) &= (uint8_t)(~(0b00000001 << clear_bit));
+		}
+		else {
+			//(*target_op_ptr) &= (uint8_t)(~(0b00000001 << clear_bit));
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) & (uint8_t)(~(0b00000001 << clear_bit)));
+		}
 	}
 	void PREFIX_process__RES_0(uint8_t* target_op_ptr) {
 		PREFIX_sub_process__RES(0, target_op_ptr);
@@ -4474,7 +4650,13 @@ private:
 	}
 
 	void PREFIX_sub_process__SET(uint8_t set_bit, uint8_t* target_op_ptr) {
-		(*target_op_ptr) |= (0b00000001 << set_bit);
+		if (target_op_ptr != nullptr) {
+			(*target_op_ptr) |= (0b00000001 << set_bit);
+		}
+		else {
+			//(*target_op_ptr) |= (0b00000001 << set_bit);
+			write_RAM_8bit(gbx_register.HL, read_RAM_8bit(gbx_register.HL) | (0b00000001 << set_bit));
+		}
 	}
 	void PREFIX_process__SET_0(uint8_t* target_op_ptr) {
 		PREFIX_sub_process__SET(0, target_op_ptr);
@@ -5121,19 +5303,25 @@ private:
 			if (current_STAT_mode == 0) {//0: HBlank
 				//LCD_STAT割り込み HBLANK
 				if ((read_RAM_8bit(0xFF41) & 0b00001000) != 0) {//Bit 3 - Mode 0 HBlank STAT Interrupt source
-					gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
+					//if ((gbx_ram.RAM[0xFF40] & 0b10000000) != 0) {//LCDが有効な時
+						gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
+					//}
 				}
 			}
 			else if (current_STAT_mode == 1) {//1: VBlank
 				//LCD_STAT割り込み VBLANK
 				if ((read_RAM_8bit(0xFF41) & 0b00010000) != 0) {//Bit 4 - Mode 1 VBlank STAT Interrupt source
-					gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
+					//if ((gbx_ram.RAM[0xFF40] & 0b10000000) != 0) {//LCDが有効な時
+						gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
+					//}
 				}
 			}
 			else if (current_STAT_mode == 2) {//2: Searching OAM
 				//LCD_STAT割り込み OAM
 				if ((read_RAM_8bit(0xFF41) & 0b00100000) != 0) {//Bit 5 - Mode 2 OAM STAT Interrupt source
-					gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
+					//if ((gbx_ram.RAM[0xFF40] & 0b10000000) != 0) {//LCDが有効な時
+						gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
+					//}
 				}
 			}
 		}
@@ -5156,9 +5344,11 @@ private:
 					ppu_line_y++;
 					write_RAM_8bit(0xFF44, ppu_line_y);
 
-					if (ppu_line_y == 144) {//Vblank開始
-						gbx_ram.RAM[0xFF0F] |= 0b00000001;//Vblankの割り込みを要求する
-					}
+					//if (ppu_line_y == 144) {//Vblank開始
+					//	if ((gbx_ram.RAM[0xFF40] & 0b10000000) != 0) {//LCDが有効な時
+					//		gbx_ram.RAM[0xFF0F] |= 0b00000001;//Vblankの割り込みを要求する
+					//	}
+					//}
 
 					if (ppu_line_y >= 154) {//Vblank終了
 						c_cycle_mod = c_cycle - (k + 1);//余りのC-Cycleを計算する
@@ -5201,7 +5391,9 @@ private:
 				//LCD_STAT割り込み LYC=LY
 				if ((read_RAM_8bit(0xFF41) & 0b01000000) != 0) {//Bit 6 - LYC=LY STAT Interrupt source
 					if (ppu_line_y == read_RAM_8bit(0xFF45)) {
-						gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
+						//if ((gbx_ram.RAM[0xFF40] & 0b10000000) != 0) {//LCDが有効な時
+							gbx_ram.RAM[0xFF0F] |= 0b00000010;//STAT割り込みを要求する
+						//}
 					}
 				}
 				//LCD_STATのLYC=LYのフラグを更新する
@@ -5214,8 +5406,10 @@ private:
 				//===================================
 
 				if (ppu_line_y == 144) {//Vblank開始
+					//if ((gbx_ram.RAM[0xFF40] & 0b10000000) != 0) {//LCDが有効な時
 					//初めてのときはVblankの割り込みを要求する
-					gbx_ram.RAM[0xFF0F] |= 0b00000001;//Vblankの割り込みを要求する
+						gbx_ram.RAM[0xFF0F] |= 0b00000001;//Vblankの割り込みを要求する
+					//}
 				}
 
 				if (ppu_line_y >= 154) {//Vblank終了
@@ -5357,7 +5551,7 @@ private:
 		pTexture->Release();
 	}
 
-#ifdef GBX_EMU_DEBUG
+#ifdef GAMEBOY_EMULATOR_DEBUG
 	void _debug_draw_screen_256x256_backbuffer(MyDirectXSystem* myDirectXSystem, uint8_t buffer_type) {
 		LPDIRECT3DTEXTURE9 pTexture;
 		if (FAILED(myDirectXSystem->get_pDevice3D()->CreateTexture(256, 256, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, NULL))) {
@@ -5481,7 +5675,7 @@ private:
 	}
 
 public:
-	GBX(const char* rom_filename, Key* key) : key(key) {
+	GameBoy(const char* rom_filename, Key* key) : key(key) {
 		memset(gbx_ram.RAM, 0, RAM_SIZE);
 
 		if (read_rom_file(rom_filename) != 0) {
@@ -5512,14 +5706,14 @@ public:
 
 
 		M_debug_printf("################################\n");
-		M_debug_printf("GBX::GBX() Succeed!\n");
+		M_debug_printf("GameBoy::GameBoy() Succeed!\n");
 		M_debug_printf("################################\n");
 
 		return;
 
 	gbx_init_error:
 		M_debug_printf("################################\n");
-		M_debug_printf("GBX::GBX() Failed......\n");
+		M_debug_printf("GameBoy::GameBoy() Failed......\n");
 		M_debug_printf("################################\n");
 
 		MessageBox(NULL, _T("ROMの初期化の際にエラーが発生しました"), _T("ERROR"), MB_OK | MB_ICONERROR);
@@ -5527,7 +5721,7 @@ public:
 		FATAL_ERROR_FLAG = true;
 	}
 
-	~GBX() {
+	~GameBoy() {
 		save_gamedata();
 		close_savedata_file();
 
@@ -5646,7 +5840,7 @@ public:
 			draw_screen_LCD_off(myDirectXSystem);
 		}
 
-#ifdef GBX_EMU_DEBUG
+#ifdef GAMEBOY_EMULATOR_DEBUG
 		//_debug_draw_screen_256x256_backbuffer(myDirectXSystem, 0);
 		//_debug_draw_screen_256x256_backbuffer(myDirectXSystem, 1);
 		//_debug_draw_screen_256x256_backbuffer(myDirectXSystem, 2);

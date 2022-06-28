@@ -19,7 +19,7 @@ void GameManager::execute_game_process()
 		delete gbx;
 
 		//M_debug_printf("Main::ROMFilePath = %s\n", Main::ROMFilePath);
-		gbx = new GBX(Main::ROMFilePath, key);
+		gbx = new GameBoy(Main::ROMFilePath, key);
 
 		Main::ready_read_ROM_flag = false;
 	}

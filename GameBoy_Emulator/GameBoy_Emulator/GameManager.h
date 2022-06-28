@@ -3,14 +3,14 @@
 #include "MyDirectXSystem.h"
 #include "MyDirectXImage.h"
 #include "Key.h"
-#include "GBX.h"
+#include "GameBoy.h"
 #include "Main.h"
 #include "MyDirectXDraw.h"
 
 class GameManager
 {
 private:
-	GBX* gbx = nullptr;
+	GameBoy* gbx = nullptr;
 
 	MyDirectXSystem *myDirectXSystem;
 

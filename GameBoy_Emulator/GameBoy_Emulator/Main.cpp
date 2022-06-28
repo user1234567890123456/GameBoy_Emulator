@@ -73,7 +73,7 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR command
 	CRC::Init();
 
 
-#ifdef GBX_EMU_DEBUG
+#ifdef GAMEBOY_EMULATOR_DEBUG
 	//if (full_result == IDNO) {//NO
 //	if (fullscreen_result == false) {//NO
 		AllocConsole();
@@ -402,7 +402,7 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR command
 
 	MaterialArchiveFile::End();
 
-#ifdef GBX_EMU_DEBUG
+#ifdef GAMEBOY_EMULATOR_DEBUG
 	//if (full_result == IDNO) {
 //	if (fullscreen_result == false) {
 		FreeConsole();

@@ -65,7 +65,7 @@ MaterialArchiveFile::MaterialArchiveFile() {
 		tmp_index += (uint64_t)file_info_list[i].file_size;
 	}
 
-#ifdef GBX_EMU_DEBUG
+#ifdef GAMEBOY_EMULATOR_DEBUG
 	for (int i = 0; i < file_num; i++) {
 		M_debug_printf("file_info_list[%d] [path = %s] [size = %u] [data_index = %lu]\n", i, file_info_list[i].file_path_name.c_str(), file_info_list[i].file_size, file_info_list[i].data_top_index);
 	}
