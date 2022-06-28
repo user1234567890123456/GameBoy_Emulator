@@ -1282,7 +1282,7 @@ private:
 	}
 
 	void load_gamedata() {
-		if (Main::SRAM_size == 0) {//SRAMのサイズが0のとき
+		if (cart_mbc_type != CART_MBC_TYPE::MBC2 && Main::SRAM_size == 0) {//MBCが2でなくなおかつSRAMのサイズが0のとき
 			return;
 		}
 
