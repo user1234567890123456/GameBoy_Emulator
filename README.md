@@ -20,3 +20,5 @@
 ![zel4](https://user-images.githubusercontent.com/81889210/174856917-acf9ea0a-3997-4f55-bb7b-898e77ab1f94.png)
 ![zel5](https://user-images.githubusercontent.com/81889210/174856918-4c092341-41e2-4dda-9497-35998a014e98.png)
 ![zel6](https://user-images.githubusercontent.com/81889210/175211918-1f616ecd-1d54-4103-a72e-54f506df3dca.png)
+![pinball1](https://user-images.githubusercontent.com/81889210/176226998-251857ae-5993-4d60-92f8-b9f3033a8e33.png)
+![pinball2](https://user-images.githubusercontent.com/81889210/176227006-3c84bf37-9f9d-482e-8288-e64750d0bb2b.png)
