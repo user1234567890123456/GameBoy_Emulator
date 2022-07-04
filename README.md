@@ -1,7 +1,7 @@
 # GameBoy_Emulator
 ゲームボーイカラーを統合した最新版->https://github.com/user1234567890123456/GameBoyColor_Emulator
 
-こちらは旧版です
+米こちらは旧版です
 
 ゲームボーイのエミュレーターです  
 音は未実装です  
